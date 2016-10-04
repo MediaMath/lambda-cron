@@ -71,6 +71,24 @@ Resources:
               - sqs:GetQueueUrl
             Resource: !GetAtt TaskQueue.Arn
 
+  HourlyEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: 'cron(* * * * ? *)'
+      State: DISABLED
+      Targets:
+        - Arn: !GetAtt LambdaFunction.Arn
+          Id: Hourly
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt HourlyEvent.Arn
+
+
 Outputs:
   TaskStorageBucket:
     Value: !Ref TaskStorageBucket
