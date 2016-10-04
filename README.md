@@ -1,3 +1,5 @@
+![diagram](/diagram.cvg.svg)
+
 ## Local Setup
 
 ### Requirments
@@ -26,3 +28,7 @@ task:
   key1: value 1
   key2: value 2
 ```
+
+
+### Diagram
+The diagram was created with draw.io, using the lambda-cron.xml file in this repo
