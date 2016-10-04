@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 
 BUCKET = "lambdacron-taskstoragebucket-1dnoooztm6rn0"
-QUEUE  = "LambdaCron-TaskQueue-3WCGEQEF3BCA"
+
 
 
 class CronChecker:
@@ -51,13 +51,13 @@ def handler(event, _):
     bucket = s3.Bucket(BUCKET)
 
     sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName=QUEUE)
 
     for obj in bucket.objects.all():
         task = yaml.load(obj.get()['Body'].read())
         print(task)
         if cron_checker.should_run(task['expression']):
             print("{} fired".format(task['name']))
-            queue.send_message(MessageBody="{} fired".format(task['name']))
+            queue = sqs.get_queue_by_name(QueueName=task['queue_name'])
+            queue.send_message(MessageBody=task['task'])
 
             print("**********\n")

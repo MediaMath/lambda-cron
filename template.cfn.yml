@@ -6,6 +6,10 @@
 # - s3 bucket
 # - SQS queue
 
+Parameters:
+  CodeS3Key:
+    Type: String
+    Description: Location of the most recent version of the lambda code
 
 Resources:
   TaskStorageBucket:
@@ -23,7 +27,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: lambda-cron-rmalecky
-        S3Key: code3.zip
+        S3Key: !Ref CodeS3Key
       Handler: main.handler
       MemorySize: 128
       Runtime: python2.7
@@ -70,6 +74,24 @@ Resources:
               - sqs:SendMessage
               - sqs:GetQueueUrl
             Resource: !GetAtt TaskQueue.Arn
+
+  HourlyEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: 'cron(* * * * ? *)'
+      State: DISABLED
+      Targets:
+        - Arn: !GetAtt LambdaFunction.Arn
+          Id: Hourly
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt HourlyEvent.Arn
+
 
 Outputs:
   TaskStorageBucket:
