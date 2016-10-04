@@ -6,6 +6,10 @@
 # - s3 bucket
 # - SQS queue
 
+Parameters:
+  CodeS3Key:
+    Type: String
+    Description: Location of the most recent version of the lambda code
 
 Resources:
   TaskStorageBucket:
@@ -23,7 +27,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: lambda-cron-rmalecky
-        S3Key: code4.zip
+        S3Key: !Ref CodeS3Key
       Handler: main.handler
       MemorySize: 128
       Runtime: python2.7
