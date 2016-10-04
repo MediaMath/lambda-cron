@@ -1,4 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+.venv/
+venv/
+ENV/
+
+# Tests
+.cache
+
 .DS_Store
 venv/*
 *.zip
 sample/
+
+# IntelliJ IDEs
+.idea/

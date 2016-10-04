@@ -14,8 +14,6 @@ from datetime import datetime, timedelta
 
 BUCKET = "lambdacron-taskstoragebucket-1dnoooztm6rn0"
 
-
-
 class CronChecker:
 
     def __init__(self, current_timestamp, hour_period=1, minutes_period=0):
