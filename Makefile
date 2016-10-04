@@ -28,4 +28,4 @@ update-code:
 	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
 	zip -r $(cur-dir)/code.zip .
 	zip code.zip main.py
-	aws s3 cp code.zip s3://$(code_bucket)/code3.zip
+	aws s3 cp code.zip s3://$(code_bucket)/code4.zip

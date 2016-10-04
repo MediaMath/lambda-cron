@@ -23,7 +23,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: lambda-cron-rmalecky
-        S3Key: code3.zip
+        S3Key: code4.zip
       Handler: main.handler
       MemorySize: 128
       Runtime: python2.7
