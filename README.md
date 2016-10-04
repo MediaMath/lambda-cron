@@ -14,3 +14,15 @@ From the repo root dir
 $ virtualenv venv
 $ pip install -r requirements.txt
 ```
+
+
+## Sample Task Definition
+
+``` yaml
+name: sample name
+expression: "0 2 * * *"
+queue_name: some-sqs-queue
+task:
+  key1: value 1
+  key2: value 2
+```

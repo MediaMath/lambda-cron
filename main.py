@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 PERIOD = timedelta(hours=1)
 BUCKET = "lambdacron-taskstoragebucket-1dnoooztm6rn0"
-QUEUE  = "LambdaCron-TaskQueue-3WCGEQEF3BCA"
+
 
 def start_of_period(timestamp):
     """ Find the start of the current period
@@ -40,7 +40,6 @@ def handler(event, _):
     bucket = s3.Bucket(BUCKET)
 
     sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName=QUEUE)
 
     for obj in bucket.objects.all():
         task = yaml.load(obj.get()['Body'].read())
@@ -49,6 +48,7 @@ def handler(event, _):
         print(next_event)
         if start < next_event and next_event <= start + PERIOD:
             print("{} fired".format(task['name']))
-            queue.send_message(MessageBody="{} fired".format(task['name']))
+            queue = sqs.get_queue_by_name(QueueName=task['queue_name'])
+            queue.send_message(MessageBody=task['task'])
 
             print("**********\n")
