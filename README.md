@@ -2,7 +2,7 @@
 
 ## Local Setup
 
-### Requirments
+### Requirements
 - Python 2.7
 - Virtual Environment
 - pip
