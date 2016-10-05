@@ -1,4 +1,4 @@
-![diagram](/diagram.cvg.svg)
+![diagram](/diagram.png)
 
 ## Local Setup
 
