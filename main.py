@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 
 BUCKET = "lambdacron-taskstoragebucket-1dnoooztm6rn0"
 
+
 class CronChecker:
 
     def __init__(self, current_timestamp, hour_period=1, minutes_period=0):
@@ -35,9 +36,7 @@ class CronChecker:
 
     def should_run(self, cron_expression):
         next_event = croniter(cron_expression, self.start_of_period).get_next(datetime)
-        if self.start_of_period < next_event and next_event <= (self.start_of_period + self.period):
-            return True
-        return False
+        return (self.start_of_period < next_event and next_event <= (self.start_of_period + self.period))
 
 
 def handler(event, _):
