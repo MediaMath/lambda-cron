@@ -1,2 +1,2 @@
--r requirments.txt
+-r requirements.txt
 pytest==3.0.3
