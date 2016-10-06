@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
+
 ![diagram](/diagram.png)
 
 ## Local Setup
