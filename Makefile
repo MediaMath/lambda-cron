@@ -10,7 +10,7 @@ update-stack:
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
 				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true ParameterKey=Environment,ParameterValue=${env} \
-				--capabilities CAPABILITY_IAM
+				--capabilities CAPABILITY_NAMED_IAM
 
 list:
 	aws cloudformation list-stack-resources --stack-name $(cfn_stack)
@@ -36,7 +36,7 @@ update-code:
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
 				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
-				--capabilities CAPABILITY_IAM
+				--capabilities CAPABILITY_NAMED_IAM
 
 init:
 	aws s3api create-bucket --bucket $(code_bucket)

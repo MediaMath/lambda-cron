@@ -68,13 +68,13 @@ Resources:
             Action:
               - s3:ListBucket
             Resource: !Sub
-              - arn:aws:s3:::lambda-cron.${environment}.mmknox/tasks/
+              - arn:aws:s3:::lambda-cron.${environment}.mmknox
               - { environment: !Ref Environment }
           - Effect: Allow
             Action:
               - s3:GetObject
             Resource: !Sub
-              - arn:aws:s3:::lambda-cron.${environment}.mmknox/tasks/
+              - arn:aws:s3:::lambda-cron.${environment}.mmknox/tasks/*
               - { environment: !Ref Environment }
           - Effect: Allow
             Action:
