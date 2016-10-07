@@ -27,20 +27,20 @@ update-stack:
 				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_NAMED_IAM
 
-bundle-code:
+zip-code:
 	rm -f code.zip
 	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
 	zip --exclude=*pytest* --exclude=*boto3* -r $(cur-dir)/code.zip . --exclude=*pytest*
 	zip code.zip main.py
 	aws s3 cp code.zip s3://$(code_bucket)/code/$(code_file)
 
-deploy: bundle-code
+deploy: zip-code
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
 				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_NAMED_IAM
 
-init: bundle-code
+init: zip-code
 	aws cloudformation create-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
 				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
