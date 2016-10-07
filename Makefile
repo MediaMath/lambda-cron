@@ -1,14 +1,15 @@
-cfn_stack   = LambdaCron
+cfn_stack   = LambdaCron-${env}
 template    = template.cfn.yml
-code_bucket = lambda-cron-rmalecky
+code_bucket = lambda-cron.${env}.mmknox
 cur-dir     = $(shell pwd)
 timestamp   = $(shell date +%s)
+code_file   = code_$(timestamp).zip
 
 
 update-stack:
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true \
+				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_IAM
 
 list:
@@ -31,8 +32,21 @@ update-code:
 	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
 	zip -r $(cur-dir)/code.zip .
 	zip code.zip main.py
-	aws s3 cp code.zip s3://$(code_bucket)/code$(timestamp).zip
+	aws s3 cp code.zip s3://$(code_bucket)/code/$(code_file)
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,ParameterValue=code$(timestamp).zip \
+				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_IAM
+
+init:
+	aws s3api create-bucket --bucket $(code_bucket)
+	rm -f code.zip
+	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
+	zip -r $(cur-dir)/code.zip .
+	zip code.zip main.py
+	aws s3 cp code.zip s3://$(code_bucket)/code/$(code_file)
+	aws cloudformation create-stack --stack-name $(cfn_stack) \
+				--template-body file://$(template) \
+				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
+				--capabilities CAPABILITY_NAMED_IAM
+
