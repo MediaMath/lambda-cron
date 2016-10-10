@@ -26,7 +26,8 @@ update-stack:
 				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true \
 					ParameterKey=Environment,ParameterValue=${env} \
 					ParameterKey=State,ParameterValue=${state} \
-				--capabilities CAPABILITY_NAMED_IAM
+				--capabilities CAPABILITY_NAMED_IAM \
+				--region us-east-1
 
 deploy:
 	rm -f code.zip
@@ -39,7 +40,8 @@ deploy:
 				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) \
 					ParameterKey=Environment,ParameterValue=${env} \
 					ParameterKey=State,ParameterValue=${state} \
-				--capabilities CAPABILITY_NAMED_IAM
+				--capabilities CAPABILITY_NAMED_IAM \
+				--region us-east-1
 
 init:
 	rm -f code.zip
@@ -52,4 +54,5 @@ init:
 				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) \
 					ParameterKey=Environment,ParameterValue=${env} \
 					ParameterKey=State,ParameterValue=${state} \
-				--capabilities CAPABILITY_NAMED_IAM
+				--capabilities CAPABILITY_NAMED_IAM \
+				--region us-east-1
