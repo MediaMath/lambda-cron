@@ -11,6 +11,7 @@ import yaml
 from croniter import croniter
 from datetime import datetime, timedelta
 import re
+import json
 
 
 BUCKET_PATTERN = "lambda-cron.{}.mmknox"
@@ -43,7 +44,7 @@ class CronChecker:
 
 
 def get_environment_from_event(event):
-    m = re.search('-(\w*)$', event['resources'][0])
+    m = re.search('LambdaCron-(\w*)-', event['resources'][0])
     if m and m.group(1) in ['sandbox', 'staging', 'prod']:
         return m.group(1)
     raise EnvironmentError('Invalid environment: '+m.group(1))
@@ -63,9 +64,12 @@ def handler(event, _):
 
     for obj in bucket.objects.filter(Prefix=TASKS_PREFIX):
         if obj.key == TASKS_PREFIX: continue
-        task = yaml.load(obj.get()['Body'].read())
+        try:
+            task = yaml.load(obj.get()['Body'].read())
+        except yaml.YAMLError, exc:
+            print("Error in task definition:", exc)
         print(task)
         if cron_checker.should_run(task['expression']):
             print(" {} fired".format(task['name']))
-            queue.send_message(MessageBody=task['message'])
+            queue.send_message(MessageBody=json.dumps(task['message']))
             print("**********\n")
