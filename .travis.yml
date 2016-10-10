@@ -11,4 +11,4 @@ deploy:
   provider: script
   script: make env="sandbox" state="DISABLED" update-stack
   on:
-    branch: dev-deployment
+    branch: develop
