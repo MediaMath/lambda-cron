@@ -23,7 +23,9 @@ summary:
 update-stack:
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true ParameterKey=Environment,ParameterValue=${env} \
+				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true \
+					ParameterKey=Environment,ParameterValue=${env} \
+					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM
 
 deploy:
@@ -34,7 +36,9 @@ deploy:
 	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) ParameterKey=Environment,ParameterValue=${env} \
+				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) \
+					ParameterKey=Environment,ParameterValue=${env} \
+					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM
 
 init:
@@ -45,5 +49,7 @@ init:
 	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation create-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) ParameterKey=Environment,ParameterValue=${env} \
+				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) \
+					ParameterKey=Environment,ParameterValue=${env} \
+					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM
