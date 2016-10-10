@@ -12,6 +12,6 @@ before_deploy:
   - export PATH=$PATH:$HOME/.local/bin
 deploy:
   provider: script
-  script: make env="sandbox" state="DISABLED" update-stack
+  script: make env="sandbox" state="DISABLED" deploy
   on:
     branch: develop
