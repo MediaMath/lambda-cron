@@ -5,7 +5,6 @@ cur-dir     = $(shell pwd)
 timestamp   = $(shell date +%s)
 code_file   = code_$(timestamp).zip
 
-
 list:
 	aws cloudformation list-stack-resources --stack-name $(cfn_stack)
 
@@ -27,23 +26,24 @@ update-stack:
 				--parameters ParameterKey=CodeS3Key,UsePreviousValue=true ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_NAMED_IAM
 
-zip-code:
+deploy:
 	rm -f code.zip
 	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
 	zip --exclude=*pytest* --exclude=*boto3* -r $(cur-dir)/code.zip . --exclude=*pytest*
 	zip code.zip main.py
-	aws s3 cp code.zip s3://$(code_bucket)/code/$(code_file)
-
-deploy: zip-code
+	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
+				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_NAMED_IAM
 
-init: zip-code
+init:
+	rm -f code.zip
+	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
+	zip --exclude=*pytest* --exclude=*boto3* -r $(cur-dir)/code.zip . --exclude=*pytest*
+	zip code.zip main.py
+	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation create-stack --stack-name $(cfn_stack) \
 				--template-body file://$(template) \
-				--parameters ParameterKey=CodeS3Key,ParameterValue=$(code_file) ParameterKey=Environment,ParameterValue=${env} \
+				--parameters ParameterKey=CodeS3Key,ParameterValue=code/$(code_file) ParameterKey=Environment,ParameterValue=${env} \
 				--capabilities CAPABILITY_NAMED_IAM
-
-

@@ -22,16 +22,10 @@ Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub
-          - LambdaCron-${environment}
-          - { environment: !Ref Environment }
+      FunctionName: !Sub LambdaCron-${Environment}
       Code:
-        S3Bucket: !Sub
-          - lambda-cron.${environment}.mmknox
-          - { environment: !Ref Environment }
-        S3Key: !Sub
-          - code/${filename}
-          - { filename: !Ref CodeS3Key }
+        S3Bucket: !Sub lambda-cron.${Environment}.mmknox
+        S3Key: !Ref CodeS3Key
       Handler: main.handler
       MemorySize: 128
       Runtime: python2.7
@@ -41,9 +35,7 @@ Resources:
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub
-          - LambdaCron-${environment}
-          - { environment: !Ref Environment }
+      RoleName: !Sub LambdaCron-${Environment}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -67,36 +59,26 @@ Resources:
           - Effect: Allow
             Action:
               - s3:ListBucket
-            Resource: !Sub
-              - arn:aws:s3:::lambda-cron.${environment}.mmknox
-              - { environment: !Ref Environment }
+            Resource: !Sub arn:aws:s3:::lambda-cron.${Environment}.mmknox
           - Effect: Allow
             Action:
               - s3:GetObject
-            Resource: !Sub
-              - arn:aws:s3:::lambda-cron.${environment}.mmknox/tasks/*
-              - { environment: !Ref Environment }
+            Resource: !Sub arn:aws:s3:::lambda-cron.${Environment}.mmknox/tasks/*
           - Effect: Allow
             Action:
               - sqs:SendMessage
               - sqs:GetQueueUrl
-            Resource: !Sub
-              - arn:aws:sqs:us-east-1:438025690015:preakness-${environment}
-              - { environment: !Ref Environment }
+            Resource: !Sub arn:aws:sqs:us-east-1:438025690015:preakness-${Environment}
 
   LambdaCronHourlyEvent:
     Type: AWS::Events::Rule
     Properties:
-      Name: !Sub
-        - LambdaCron-hourly-${environment}
-        - { environment: !Ref Environment }
+      Name: !Sub LambdaCron-hourly-${Environment}
       ScheduleExpression: 'cron(0 * * * ? *)'
       State: DISABLED
       Targets:
         - Arn: !GetAtt LambdaFunction.Arn
-          Id: !Sub
-            - LambdaCron-hourly-${environment}
-            - { environment: !Ref Environment }
+          Id: !Sub LambdaCron-hourly-${Environment}
 
   LambdaCronEventPermission:
     Type: AWS::Lambda::Permission
