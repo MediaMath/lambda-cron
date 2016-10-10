@@ -8,7 +8,7 @@ env:
 install: pip install -r requirements_travis.txt
 script: python -m pytest tests/
 before_deploy:
-  - pip install --user awscli
+  - pip install awscli
   - export PATH=$PATH:$HOME/.local/bin
 deploy:
   provider: script
