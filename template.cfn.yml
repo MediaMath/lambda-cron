@@ -79,7 +79,7 @@ Resources:
   LambdaCronHourlyEvent:
     Type: AWS::Events::Rule
     Properties:
-      Name: !Sub LambdaCron-hourly-${Environment}
+      Description: !Sub LambdaCron-hourly-${Environment}
       ScheduleExpression: 'cron(0 * * * ? *)'
       State: !Ref State
       Targets:
