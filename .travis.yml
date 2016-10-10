@@ -10,5 +10,5 @@ script: python -m pytest tests/
 deploy:
   provider: script
   script: make env="sandbox" state="DISABLED" update-stack
-    on:
-      branch: dev-deployment
+  on:
+    branch: dev-deployment
