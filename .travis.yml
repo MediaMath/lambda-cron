@@ -7,6 +7,9 @@ env:
   - secure: UsRLtAxcFuxcf5+yrNLebEZe1AA4H0q1esPLoHln0vbkaBHqQbzoiFPOlaK9Jo74MHkLsIFyRsAuKlw1ZYICzaihET2ssYwKBUNe/8KeBFj3rz9ZGDMLQ7lEtVWA8gkJDNeIDySsnLgdhLJT4imaBHHo06FAV2k41iqwcU8RtURDzxSaGE5BXii2oN7IF01MmaLm9QOC0QjD0COUAGqyKC5wMT/v2GkSvWW9lRZAyY0sbhcuWF5UBzKKHJ2X36K9+ebFO9fGf6Dl/93QoTu01nnh1BXIG/xlNOP3/76z4bZkZjwnbUDs5kSR7qxYM1bEYVAjW5HTe28yf8eSzyPthRe8DPm2DFJXFYZWBJ6mjzSUiXNi1JgRceVs8rdUMxaM96J/4lT87U9wuXju8VqmCh73Ysy1jy3JK+IbOC3Qnlr9p9WOtBZdSf7IeUtj7aw/JdD/PKbiS84yCb4NE5MO3FsOqRcYFjKrvtBbpOPBVkVJ21RDncITKwEUYWDLNMazCh1gc11YqZigc7DtsMTi9S0bUNmWxtnVAGclASBbHB/Z6TJsHovfrxbDzRB+A60fLk9b0QRcXOdexlSHWjXSAbCbiA8OwZwcDnQ8Puko01xyL1f+8BfzJOqC5xn6IUQvDpn/VV/uHBMBJUN/76KgW3hNNz6GQlelC5z6ATgGO04=
 install: pip install -r requirements_travis.txt
 script: python -m pytest tests/
+before_deploy:
+  - pip install --user awscli
+  - export PATH=$PATH:$HOME/.local/bin
 deploy:
   provider: script
   script: make env="sandbox" state="DISABLED" update-stack
