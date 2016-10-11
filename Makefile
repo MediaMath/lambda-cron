@@ -31,8 +31,9 @@ update-stack:
 
 deploy:
 	rm -f code.zip
-	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
-	zip --exclude=*pytest* --exclude=*boto3* -r $(cur-dir)/code.zip . --exclude=*pytest*
+	pip install --requirement requirements.txt --target=/tmp/knox_lambda_cron_dependencies --ignore-installed
+	cd /tmp/knox_lambda_cron_dependencies; zip -r $(cur-dir)/code.zip .
+	rm -rf /tmp/knox_lambda_cron_dependencies
 	zip code.zip main.py
 	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
@@ -45,8 +46,9 @@ deploy:
 
 init:
 	rm -f code.zip
-	cd $(VIRTUAL_ENV)/lib/python2.7/site-packages; \
-	zip --exclude=*pytest* --exclude=*boto3* -r $(cur-dir)/code.zip . --exclude=*pytest*
+	pip install --requirement requirements.txt --target=/tmp/knox_lambda_cron_dependencies --ignore-installed
+	cd /tmp/knox_lambda_cron_dependencies; zip -r $(cur-dir)/code.zip .
+	rm -rf /tmp/knox_lambda_cron_dependencies
 	zip code.zip main.py
 	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation create-stack --stack-name $(cfn_stack) \
