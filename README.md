@@ -1,5 +1,9 @@
 [![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
 
+# Knox Lambda Cron
+
+Project to run cron system using lambda functions on AWS.
+
 ![diagram](/diagram.png)
 
 ## Local Setup
