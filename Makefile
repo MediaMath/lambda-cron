@@ -13,6 +13,7 @@ events:
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name $(cfn_stack)
+	aws cloudformation wait stack-delete-complete --stack-name $(cfn_stack)
 
 validate:
 	aws cloudformation validate-template --template-body file://$(template)
@@ -43,6 +44,7 @@ deploy:
 					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM \
 				--region us-east-1
+	aws cloudformation wait stack-update-complete --stack-name $(cfn_stack)
 
 init:
 	rm -f code.zip
@@ -58,3 +60,4 @@ init:
 					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM \
 				--region us-east-1
+	aws cloudformation wait stack-create-complete --stack-name $(cfn_stack)
