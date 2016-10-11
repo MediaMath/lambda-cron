@@ -2,9 +2,28 @@
 
 # Knox Lambda Cron
 
-Project to run cron system using lambda functions on AWS.
+Project to run scheduled tasks using lambda functions on AWS.
 
 ![diagram](/diagram.png)
+
+Lamdba function will run once an hour, it will read all tasks available and it
+will run all jobs that should run in that hour.
+
+Tasks are saved in a S3 bucket:
+
+```
+s3://lambda-cron.prod.mmknox/tasks/
+```
+
+## Sample Task Definition
+
+``` yaml
+name: sample name
+expression: "0 2 * * *"
+task:
+  key1: value 1
+  key2: value 2
+```
 
 ## Local Setup
 
@@ -23,17 +42,22 @@ $ virtualenv venv
 $ pip install -r requirements.txt
 ```
 
-
-## Sample Task Definition
-
-``` yaml
-name: sample name
-expression: "0 2 * * *"
-task:
-  key1: value 1
-  key2: value 2
-```
-
-
-### Diagram
+## Diagram
 The diagram was created with draw.io, using the lambda-cron.xml file in this repo
+
+## Deployment
+Deployment is automated with Travis CI:
+
+* Branch **develop**: deploy sandbox
+* Branch **staging**: deploy staging
+* New **tag** version: deploy prod
+
+## TODO & Ideas
+
+* Monitoring
+    * Logs & metrics
+    * Cloudwatch alerts
+* Lambda code:
+    * Add tag name (version) to .zip file
+    * Upload .zip file directly to lambda function (not to S3) ?
+    * Add tag name (version) to lambda function description ?
