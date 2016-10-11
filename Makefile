@@ -6,20 +6,20 @@ timestamp   = $(shell date +%s)
 code_file   = code_$(timestamp).zip
 
 list:
-	aws cloudformation list-stack-resources --stack-name $(cfn_stack)
+	aws cloudformation list-stack-resources --stack-name $(cfn_stack) --region us-east-1
 
 events:
-	aws cloudformation describe-stack-events --stack-name $(cfn_stack)
+	aws cloudformation describe-stack-events --stack-name $(cfn_stack) --region us-east-1
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name $(cfn_stack)
-	aws cloudformation wait stack-delete-complete --stack-name $(cfn_stack)
+	aws cloudformation wait stack-delete-complete --stack-name $(cfn_stack) --region us-east-1
 
 validate:
-	aws cloudformation validate-template --template-body file://$(template)
+	aws cloudformation validate-template --template-body file://$(template) --region us-east-1
 
 summary:
-	aws cloudformation get-template-summary --stack-name $(cfn_stack)
+	aws cloudformation get-template-summary --stack-name $(cfn_stack) --region us-east-1
 
 update-stack:
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
@@ -44,7 +44,7 @@ deploy:
 					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM \
 				--region us-east-1
-	aws cloudformation wait stack-update-complete --stack-name $(cfn_stack)
+	aws cloudformation wait stack-update-complete --stack-name $(cfn_stack) --region us-east-1
 
 init:
 	rm -f code.zip
@@ -60,4 +60,4 @@ init:
 					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM \
 				--region us-east-1
-	aws cloudformation wait stack-create-complete --stack-name $(cfn_stack)
+	aws cloudformation wait stack-create-complete --stack-name $(cfn_stack) --region us-east-1
