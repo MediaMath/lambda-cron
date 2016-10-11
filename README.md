@@ -15,6 +15,8 @@ Tasks are saved in a S3 bucket:
 s3://lambda-cron.prod.mmknox/tasks/
 ```
 
+Task are defined in [knox-lambda-cron-tasks](https://github.com/MediaMath/knox-lambda-cron-tasks)
+
 ## Sample Task Definition
 
 ``` yaml
