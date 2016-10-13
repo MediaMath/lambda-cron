@@ -1,6 +1,31 @@
 [![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
 
+# Knox Lambda Cron
+
+Project to run scheduled tasks using lambda functions on AWS.
+
 ![diagram](/diagram.png)
+
+Lamdba function will run once an hour, it will read all tasks available and it
+will run all jobs that should run in that hour.
+
+Tasks are saved in a S3 bucket:
+
+```
+s3://lambda-cron.prod.mmknox/tasks/
+```
+
+Task are defined in [knox-lambda-cron-tasks](https://github.com/MediaMath/knox-lambda-cron-tasks)
+
+## Sample Task Definition
+
+``` yaml
+name: sample name
+expression: "0 2 * * *"
+task:
+  key1: value 1
+  key2: value 2
+```
 
 ## Local Setup
 
@@ -19,18 +44,26 @@ $ virtualenv venv
 $ pip install -r requirements.txt
 ```
 
-
-## Sample Task Definition
-
-``` yaml
-name: sample name
-expression: "0 2 * * *"
-queue_name: some-sqs-queue
-task:
-  key1: value 1
-  key2: value 2
-```
-
-
-### Diagram
+## Diagram
 The diagram was created with draw.io, using the lambda-cron.xml file in this repo
+
+## Deployment
+Deployment is automated with Travis CI:
+
+* Branch **develop**: deploy sandbox
+* Branch **staging**: deploy staging
+* New **tag** version: deploy prod
+
+## TODO & Ideas & Features
+
+* Monitoring
+    * Logs & metrics
+    * Cloudwatch alerts
+* Lambda code:
+    * Add tag name (version) to .zip file
+    * Upload .zip file directly to lambda function (not to S3) ?
+    * Add tag name (version) to lambda function description ?
+* Feature
+    * Disable crons (Expresion = DISABLED)
+    * Read only reports that must run
+    * Be able to use variables in task definition: dates.

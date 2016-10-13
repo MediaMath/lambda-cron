@@ -1,32 +1,28 @@
-# TODO
-# Lambda function
-# Lambda function role
-# Cloudwatch Event
-# Cloudwatch event permission to invoke role
-# - s3 bucket
-# - SQS queue
-
 Parameters:
   CodeS3Key:
     Type: String
     Description: Location of the most recent version of the lambda code
+  Environment:
+    Type: String
+    AllowedValues:
+      - sandbox
+      - staging
+      - prod
+    Description: Environment to run the function.
+  State:
+    Type: String
+    AllowedValues:
+      - ENABLED
+      - DISABLED
+    Description: State for CloudWatch event
 
 Resources:
-  TaskStorageBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      Tags:
-          - Key: Project
-            Value: LambdaCron
-
-  TaskQueue:
-    Type: AWS::SQS::Queue
-
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: !Sub LambdaCron-${Environment}
       Code:
-        S3Bucket: lambda-cron-rmalecky
+        S3Bucket: !Sub lambda-cron.${Environment}.mmknox
         S3Key: !Ref CodeS3Key
       Handler: main.handler
       MemorySize: 128
@@ -37,6 +33,7 @@ Resources:
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub LambdaCron-${Environment}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -60,44 +57,40 @@ Resources:
           - Effect: Allow
             Action:
               - s3:ListBucket
-            Resource: !Sub
-              - arn:aws:s3:::${bucket}
-              - { bucket: !Ref TaskStorageBucket }
+            Resource: !Sub arn:aws:s3:::lambda-cron.${Environment}.mmknox
           - Effect: Allow
             Action:
               - s3:GetObject
-            Resource: !Sub
-              - arn:aws:s3:::${bucket}/*
-              - { bucket: !Ref TaskStorageBucket }
+            Resource: !Sub arn:aws:s3:::lambda-cron.${Environment}.mmknox/tasks/*
           - Effect: Allow
             Action:
               - sqs:SendMessage
               - sqs:GetQueueUrl
-            Resource: !GetAtt TaskQueue.Arn
+            Resource: !Sub arn:aws:sqs:us-east-1:438025690015:preakness-${Environment}
 
-  HourlyEvent:
+  LambdaCronHourlyEvent:
     Type: AWS::Events::Rule
     Properties:
-      ScheduleExpression: 'cron(* * * * ? *)'
-      State: DISABLED
+      Description: !Sub LambdaCron-hourly-${Environment}
+      ScheduleExpression: 'cron(0 * * * ? *)'
+      State: !Ref State
       Targets:
         - Arn: !GetAtt LambdaFunction.Arn
-          Id: Hourly
+          Id: !Sub LambdaCron-hourly-${Environment}
 
-  PermissionForEventsToInvokeLambda:
+  LambdaCronEventPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref LambdaFunction
       Action: lambda:InvokeFunction
       Principal: events.amazonaws.com
-      SourceArn: !GetAtt HourlyEvent.Arn
-
+      SourceArn: !GetAtt LambdaCronHourlyEvent.Arn
 
 Outputs:
-  TaskStorageBucket:
-    Value: !Ref TaskStorageBucket
-    Description: Bucket to store tasks
+  LambdaFunction:
+    Value: !Ref LambdaFunction
+    Description: LambdaFunction
+  LambdaRole:
+    Value: !Ref LambdaRole
+    Description: LambdaRole
 
-  TaskQueue:
-    Value: !GetAtt TaskQueue.Arn
-    Description: Task Queue Arn

@@ -10,9 +10,13 @@ import boto3
 import yaml
 from croniter import croniter
 from datetime import datetime, timedelta
+import re
+import json
 
 
-BUCKET = "lambdacron-taskstoragebucket-1dnoooztm6rn0"
+BUCKET_PATTERN = "lambda-cron.{}.mmknox"
+QUEUE_PATTERN = "preakness-{}"
+TASKS_PREFIX = 'tasks/'
 
 
 class CronChecker:
@@ -39,22 +43,33 @@ class CronChecker:
         return (self.start_of_period < next_event and next_event <= (self.start_of_period + self.period))
 
 
+def get_environment_from_event(event):
+    m = re.search('LambdaCron-(\w*)-', event['resources'][0])
+    if m and m.group(1) in ['sandbox', 'staging', 'prod']:
+        return m.group(1)
+    raise EnvironmentError('Invalid environment: '+m.group(1))
+
+
 def handler(event, _):
     """ Main function """
     print(event)
+
+    environment = get_environment_from_event(event)
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(BUCKET_PATTERN.format(environment))
+    sqs = boto3.resource('sqs')
+    queue = sqs.get_queue_by_name(QueueName=QUEUE_PATTERN.format(environment))
+
     cron_checker = CronChecker(event['time'], hour_period=1, minutes_period=0)
 
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(BUCKET)
-
-    sqs = boto3.resource('sqs')
-
-    for obj in bucket.objects.all():
-        task = yaml.load(obj.get()['Body'].read())
+    for obj in bucket.objects.filter(Prefix=TASKS_PREFIX):
+        if obj.key == TASKS_PREFIX: continue
+        try:
+            task = yaml.load(obj.get()['Body'].read())
+        except yaml.YAMLError, exc:
+            print("Error in task definition:", exc)
         print(task)
         if cron_checker.should_run(task['expression']):
-            print("{} fired".format(task['name']))
-            queue = sqs.get_queue_by_name(QueueName=task['queue_name'])
-            queue.send_message(MessageBody=task['task'])
-
+            print(" {} fired".format(task['name']))
+            queue.send_message(MessageBody=json.dumps(task['message']))
             print("**********\n")
