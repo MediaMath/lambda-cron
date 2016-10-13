@@ -29,6 +29,7 @@ update-stack:
 					ParameterKey=State,ParameterValue=${state} \
 				--capabilities CAPABILITY_NAMED_IAM \
 				--region us-east-1
+	aws cloudformation wait stack-delete-complete --stack-name $(cfn_stack) --region us-east-1
 
 deploy:
 	rm -f code.zip
