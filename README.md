@@ -54,7 +54,7 @@ Deployment is automated with Travis CI:
 * Branch **staging**: deploy staging
 * New **tag** version: deploy prod
 
-## TODO & Ideas
+## TODO & Ideas & Features
 
 * Monitoring
     * Logs & metrics
@@ -63,3 +63,6 @@ Deployment is automated with Travis CI:
     * Add tag name (version) to .zip file
     * Upload .zip file directly to lambda function (not to S3) ?
     * Add tag name (version) to lambda function description ?
+* Feature
+    * Disable crons (Expresion = DISABLED)
+    * Read only reports that must run
