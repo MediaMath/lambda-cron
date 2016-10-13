@@ -66,3 +66,4 @@ Deployment is automated with Travis CI:
 * Feature
     * Disable crons (Expresion = DISABLED)
     * Read only reports that must run
+    * Be able to use variables in task definition: dates.
