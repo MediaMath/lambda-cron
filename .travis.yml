@@ -16,7 +16,7 @@ deploy:
     on:
       branch: develop
   - provider: script
-    script: make env="staging" state="ENABLED" deploy
+    script: make env="staging" state="DISABLED" deploy
     on:
       branch: staging
   - provider: script
