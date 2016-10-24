@@ -19,7 +19,7 @@ s3://lambda-cron.prod.mmknox/tasks/
 
 Task are defined in [knox-lambda-cron-tasks](https://github.com/MediaMath/knox-lambda-cron-tasks)
 
-## Sample Task Definition
+#### Sample Task Definition
 
 ``` yaml
 name: sample name
@@ -28,26 +28,6 @@ task:
   key1: value 1
   key2: value 2
 ```
-
-## Local Setup
-
-### Requirements
-- Python 2.7
-- Virtual Environment
-- pip
-- Boto3
-  - Boto3 is installed as part of the lambda functions Environment.  To aviod the overhead of including it in your deployment artifact install boto3 on your system instead of in the virtual environment
-- awscli (configured)
-
-### Setup
-From the repo root dir
-``` bash
-$ virtualenv venv
-$ pip install -r requirements.txt
-```
-
-## Diagram
-The diagram was created with draw.io, using the lambda-cron.xml file in this repo
 
 ## Development
 
@@ -80,6 +60,23 @@ Project is deployed automatically under following criteria:
 * Branch **staging**: deploy staging
 * New **tag** version: deploy prod
 
+## Local Setup
+
+### Requirements
+- Python 2.7
+- Virtual Environment
+- pip
+- Boto3
+  - Boto3 is installed as part of the lambda functions Environment.  To aviod the overhead of including it in your deployment artifact install boto3 on your system instead of in the virtual environment
+- awscli (configured)
+
+### Setup
+From the repo root dir
+``` bash
+$ virtualenv venv
+$ pip install -r requirements.txt
+```
+
 ## TODO & Ideas & Features
 
 * Monitoring
@@ -93,3 +90,6 @@ Project is deployed automatically under following criteria:
     * Disable crons (Expresion = DISABLED)
     * Read only reports that must run
     * Be able to use variables in task definition: dates.
+    
+## Diagram
+The diagram was created with draw.io, using the lambda-cron.xml file in this repo
