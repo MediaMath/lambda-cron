@@ -16,6 +16,9 @@ Parameters:
       - DISABLED
     Description: State for CloudWatch event
 
+Conditions:
+  IsProdEnvironment: !Equals [!Ref Environment, prod]
+
 Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
@@ -116,7 +119,7 @@ Resources:
       AlarmActions:
         - Ref: LambdaCronSNSTopic
       AlarmDescription: !Sub Errors in LambdaCron ${Environment}
-      ActionsEnabled: True
+      ActionsEnabled: !If [IsProdEnvironment, True, False]
 
 Outputs:
   LambdaFunction:
