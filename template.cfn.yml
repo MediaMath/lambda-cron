@@ -86,6 +86,38 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn: !GetAtt LambdaCronHourlyEvent.Arn
 
+  LambdaCronSNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      Subscription:
+        -
+          Endpoint: "jbravo@mediamath.com"
+          Protocol: "email"
+      TopicName: !Sub LambdaCron-${Environment}
+
+  LambdaCronAalarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Threshold: 1
+      Statistic: Sum
+      Unit: Count
+      Period: '3600'
+      EvaluationPeriods: '1'
+      Dimensions:
+        - Name: FunctionName
+          Value:
+            Ref: LambdaFunction
+        - Name: Resource
+          Value:
+            Ref: LambdaFunction
+      AlarmActions:
+        - Ref: LambdaCronSNSTopic
+      AlarmDescription: !Sub Errors in LambdaCron ${Environment}
+      ActionsEnabled: True
+
 Outputs:
   LambdaFunction:
     Value: !Ref LambdaFunction
