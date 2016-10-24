@@ -4,6 +4,7 @@ code_bucket = lambda-cron.${env}.mmknox
 cur-dir     = $(shell pwd)
 timestamp   = $(shell date +%s)
 code_file   = code_$(timestamp).zip
+datetime_formatted = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 list:
 	aws cloudformation list-stack-resources --stack-name $(cfn_stack) --region us-east-1
@@ -20,6 +21,12 @@ validate:
 
 summary:
 	aws cloudformation get-template-summary --stack-name $(cfn_stack) --region us-east-1
+
+invoke:
+	echo '{"source": "FINP Dev", "time": "${datetime_formatted}", "resources": ["Manual:invoke/LambdaCron-${env}-LambdaCronHourlyEvent-ZZZ"]}'
+	aws lambda invoke --invocation-type Event --function-name LambdaCron-${env} \
+    	--payload '{"source": "FINP Dev", "time": "${datetime_formatted}", "resources": ["Manual:invoke/LambdaCron-${env}-LambdaCronHourlyEvent-ABC"]}' \
+    	/tmp/lambdaCron_invoke_output.txt
 
 update-stack:
 	aws cloudformation update-stack --stack-name $(cfn_stack) \
