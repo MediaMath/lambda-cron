@@ -8,6 +8,8 @@ Project to run scheduled tasks using lambda functions on AWS.
 
 Lamdba function will run once an hour, it will read all tasks available and it
 will run all jobs that should run in that hour.
+Tasks will run on [Preakness](https://github.com/MediaMath/preakness). JSON (YAML) object
+defined under **task** key will be sent to *Preakness* SQS queue.
 
 Tasks are saved in a S3 bucket:
 
@@ -47,8 +49,32 @@ $ pip install -r requirements.txt
 ## Diagram
 The diagram was created with draw.io, using the lambda-cron.xml file in this repo
 
-## Deployment
-Deployment is automated with Travis CI:
+## Development
+
+#### CloudFormation
+Project is running 100% with AWS resources and they are defined using CloudFormation.
+The the template defined a stack will be created in AWS and it will be managed using
+CloudFormation tools.
+
+#### Makefile
+The Makefile contains all the instructions needed to work with the project:
+
+* **init**: Initialize environment
+* **deploy**: Deploy code to S3 and update stack in AWS
+* **update-stack**: Update stack in AWS
+* **invoke**: Invoke Lambda function in AWS
+* **test**: Run tests
+* **list**: List stack's resources in AWS
+* **events**: Describe stack's events in AWS
+* **validate**: Validate CloudFormation template
+* **summary**: Get CloudFormation tempalte summary
+* **delete-stack**: Delete stack in AWS
+
+#### Deployment
+The project is working with Travis CI as Continuous Integration environment. All commits are
+tested.
+
+Project is deployed automatically under following criteria:
 
 * Branch **develop**: deploy sandbox
 * Branch **staging**: deploy staging
