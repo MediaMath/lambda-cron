@@ -91,6 +91,7 @@ Resources:
 
   LambdaCronSNSTopic:
     Type: "AWS::SNS::Topic"
+    Condition: IsProdEnvironment
     Properties:
       Subscription:
         -
@@ -100,6 +101,7 @@ Resources:
 
   LambdaCronAalarm:
     Type: "AWS::CloudWatch::Alarm"
+    Condition: IsProdEnvironment
     Properties:
       Namespace: AWS/Lambda
       MetricName: Errors
@@ -119,7 +121,7 @@ Resources:
       AlarmActions:
         - Ref: LambdaCronSNSTopic
       AlarmDescription: !Sub Errors in LambdaCron ${Environment}
-      ActionsEnabled: !If [IsProdEnvironment, True, False]
+      ActionsEnabled: True
 
 Outputs:
   LambdaFunction:
