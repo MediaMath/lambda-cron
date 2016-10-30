@@ -43,6 +43,19 @@ class CronChecker:
         return (self.start_of_period < next_event and next_event <= (self.start_of_period + self.period))
 
 
+class TaskRunner:
+    def __init__(self, cron_checker, queue):
+        self.cron_checker = cron_checker
+        self.queue = queue
+
+    def run(self, task_body):
+        task = yaml.load(task_body)
+        if self.cron_checker.should_run(task['expression']):
+            self.queue.send_message(MessageBody=json.dumps(task['message']))
+            return task['name']
+        return None
+
+
 def get_environment_from_event(event):
     m = re.search('LambdaCron-(\w*)-', event['resources'][0])
     if m and m.group(1) in ['sandbox', 'staging', 'prod']:
