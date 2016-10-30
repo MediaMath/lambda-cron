@@ -1,8 +1,7 @@
 """ Cron Lambda function
-    This lambda function is designed to be exected at the start of each hour,
-    read task definistions from a lambda bucket and if the cron expression
-    in the tasks indicates is should be executed in the next hour send
-    it to an SQS queue.
+    This lambda function is designed to be executed periodically,
+    read task definitions from a S3 bucket and if the cron expression
+    in the tasks indicates is should be executed send it to an SQS queue.
 """
 from __future__ import print_function
 
