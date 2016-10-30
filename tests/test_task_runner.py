@@ -1,5 +1,4 @@
 import pytest
-import yaml
 import json
 from main import TaskRunner, CronChecker
 
