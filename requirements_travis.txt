@@ -1,2 +1,2 @@
--r requirements.txt
+-r requirements_dev.txt
 boto3==1.4.0
