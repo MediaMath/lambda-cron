@@ -42,8 +42,8 @@ def base_task_definition():
 
 def test_should_run_basic(cron_checker, queue, base_task_definition):
     task_runner = TaskRunner(cron_checker, queue)
-    result = task_runner.run(yaml.dump(base_task_definition))
-    assert result == base_task_definition['name']
+    result = task_runner.run(base_task_definition)
+    assert result is True
     assert queue.messages_sent == 1
     assert queue.message_body == json.dumps(MESSAGE_BODY)
 
@@ -51,8 +51,8 @@ def test_should_run_basic(cron_checker, queue, base_task_definition):
 def test_should_not_by_time_run_basic(cron_checker, queue, base_task_definition):
     task_runner = TaskRunner(cron_checker, queue)
     base_task_definition['expression'] = '0 9 * * *'
-    result = task_runner.run(yaml.dump(base_task_definition))
-    assert result is None
+    result = task_runner.run(base_task_definition)
+    assert result is False
     assert queue.messages_sent == 0
     assert queue.message_body is None
 
@@ -61,7 +61,7 @@ def test_expression_not_defined(cron_checker, queue, base_task_definition):
     task_runner = TaskRunner(cron_checker, queue)
     base_task_definition.pop('expression', None)
     with pytest.raises(KeyError) as exception_info:
-        task_runner.run(yaml.dump(base_task_definition))
+        task_runner.run(base_task_definition)
     exception_info.match(r'expression')
 
 
@@ -69,7 +69,7 @@ def test_message_not_defined(cron_checker, queue, base_task_definition):
     task_runner = TaskRunner(cron_checker, queue)
     base_task_definition.pop('message', None)
     with pytest.raises(KeyError) as exception_info:
-        task_runner.run(yaml.dump(base_task_definition))
+        task_runner.run(base_task_definition)
     exception_info.match(r'message')
 
 

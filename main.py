@@ -12,6 +12,7 @@ from croniter import croniter
 from datetime import datetime, timedelta
 import re
 import json
+import traceback
 
 
 BUCKET_PATTERN = "lambda-cron.{}.mmknox"
@@ -48,12 +49,11 @@ class TaskRunner:
         self.cron_checker = cron_checker
         self.queue = queue
 
-    def run(self, task_body):
-        task = yaml.load(task_body)
-        if self.cron_checker.should_run(task['expression']):
-            self.queue.send_message(MessageBody=json.dumps(task['message']))
-            return task['name']
-        return None
+    def run(self, task_definition):
+        if self.cron_checker.should_run(task_definition['expression']):
+            self.queue.send_message(MessageBody=json.dumps(task_definition['message']))
+            return True
+        return False
 
 
 def get_environment_from_event(event):
@@ -74,15 +74,15 @@ def handler(event, _):
     queue = sqs.get_queue_by_name(QueueName=QUEUE_PATTERN.format(environment))
 
     cron_checker = CronChecker(event['time'], hour_period=1, minutes_period=0)
+    task_runner = TaskRunner(cron_checker, queue)
 
     for obj in bucket.objects.filter(Prefix=TASKS_PREFIX):
-        if obj.key == TASKS_PREFIX: continue
+        if obj.key == TASKS_PREFIX:
+            continue
         try:
-            task = yaml.load(obj.get()['Body'].read())
-        except yaml.YAMLError, exc:
-            print("Error in task definition:", exc)
-        print(task)
-        if cron_checker.should_run(task['expression']):
-            print(" {} fired".format(task['name']))
-            queue.send_message(MessageBody=json.dumps(task['message']))
-            print("**********\n")
+            task_definition = yaml.load(obj.get()['Body'].read())
+            if task_runner.run(task_definition):
+                print("* Task fired: {}".format(task_definition['name']))
+        except Exception, exc:
+            print("! Error processing task: {}".format(obj.key))
+            traceback.print_exc()
