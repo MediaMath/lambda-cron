@@ -3,8 +3,9 @@
     read task definitions from a S3 bucket and if the cron expression
     in the tasks indicates is should be executed send it to an SQS queue.
 """
-from __future__ import print_function
 
+import sys
+import logging
 import boto3
 import yaml
 import re
@@ -12,6 +13,9 @@ import traceback
 from src.cron_checker import CronChecker
 from src.task_runner import TaskRunner
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 BUCKET_PATTERN = "lambda-cron.{}.mmknox"
 QUEUE_PATTERN = "preakness-{}"
@@ -27,7 +31,7 @@ def get_environment_from_event(event):
 
 def handler(event, _):
     """ Main function """
-    print(event)
+    logger.info(event)
 
     environment = get_environment_from_event(event)
     s3 = boto3.resource('s3')
@@ -44,7 +48,7 @@ def handler(event, _):
         try:
             task_definition = yaml.load(obj.get()['Body'].read())
             if task_runner.run(task_definition):
-                print("* Task fired: {}".format(task_definition['name']))
+                logger.info("** Task fired: {}".format(task_definition['name']))
         except Exception, exc:
-            print("! Error processing task: {}".format(obj.key))
+            logger.error("!! Error processing task: {}".format(obj.key))
             traceback.print_exc()
