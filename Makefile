@@ -12,7 +12,7 @@ init:
 	cd /tmp/knox_lambda_cron_dependencies; zip -r $(cur-dir)/code.zip .
 	rm -rf /tmp/knox_lambda_cron_dependencies
 	zip code.zip main.py
-	zip -r code.zip srcst
+	zip -r code.zip src
 	aws s3api create-bucket --bucket $(code_bucket) --region us-east-1
 	aws s3 cp code.zip s3://$(code_bucket)/code/${code_file}
 	aws cloudformation create-stack --stack-name $(cfn_stack) \
