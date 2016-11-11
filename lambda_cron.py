@@ -36,8 +36,9 @@ def zip_dir(zip_file, path, prefix=''):
 
 class LambdaCronCLI:
 
-    def __init__(self, environment):
+    def __init__(self, environment, state):
         self.environment = environment
+        self.state = state
         self.timestamp = int(round(time.time() * 1000))
 
     def get_tmp_directory(self):
@@ -51,6 +52,9 @@ class LambdaCronCLI:
 
     def get_code_zip_file_path(self):
         return os.path.join(self.get_tmp_directory(), self.get_code_zip_file_name())
+
+    def get_stack_name(self):
+        return "LambdaCron-{environment}".format(environment=self.environment)
 
     def get_bucket_name(self):
         return "lambda-cron.{environment}.mmknox".format(environment=self.environment)
@@ -78,10 +82,29 @@ class LambdaCronCLI:
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
         subprocess.call(s3_upload_command)
 
+    def update_stack(self):
+        update_stack_command = [
+            "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
+            "--template-body", "file://{}".format(get_project_path('template.cfn.yml')),
+            "--parameters", "ParameterKey=CodeS3Key,ParameterValue=code/{}".format(self.get_code_zip_file_name()),
+            "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.environment),
+            "ParameterKey=State,ParameterValue={state}".format(state=self.state),
+            "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
+        ]
+        print update_stack_command
+        subprocess.call(update_stack_command)
+        wait_update_stack_command = [
+            "aws", "cloudformation", "wait", "stack-update-complete",
+            "--stack-name", self.get_stack_name(),
+            "--region", "us-east-1"
+        ]
+        subprocess.call(wait_update_stack_command)
+
 if __name__ == '__main__':
     results = check_arg(sys.argv[1:])
     print results
-    lambda_cron_cli = LambdaCronCLI(results.environment)
+    lambda_cron_cli = LambdaCronCLI(results.environment, results.state)
     lambda_cron_cli.zip_code()
     lambda_cron_cli.upload_code_to_s3()
+    lambda_cron_cli.update_stack()
 
