@@ -1,4 +1,4 @@
-from src.cron_checker import CronChecker
+from lib.cron_checker import CronChecker
 
 
 def test_should_run_basic():

@@ -28,7 +28,7 @@ def check_arg(args=None):
 
 
 def get_project_directory():
-    return os.path.dirname(os.path.realpath(__file__))
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../lambda-cron'))
 
 
 def get_project_path(sub_path):
@@ -83,7 +83,7 @@ class LambdaCronCLI:
         self.install_dependencies()
         with ZipFile(self.get_code_zip_file_path(), 'w') as zip_file:
             zip_dir(zip_file, self.get_dependencies_directory())
-            zip_dir(zip_file, get_project_path('src'), 'src')
+            zip_dir(zip_file, get_project_path('lib'), 'lib')
             zip_file.write(get_project_path('main.py'), 'main.py')
 
     def upload_code_to_s3(self):
@@ -135,9 +135,10 @@ class LambdaCronCLI:
         subprocess.call(wait_update_stack_command)
 
     def create(self):
+        print get_project_directory()
         self.zip_code()
-        self.upload_code_to_s3()
-        self.create_stack()
+        # self.upload_code_to_s3()
+        # self.create_stack()
 
     def deploy(self):
         self.zip_code()

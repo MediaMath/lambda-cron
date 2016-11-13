@@ -10,8 +10,8 @@ import boto3
 import yaml
 import re
 import traceback
-from src.cron_checker import CronChecker
-from src.task_runner import TaskRunner
+from lib.cron_checker import CronChecker
+from lib.task_runner import TaskRunner
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
