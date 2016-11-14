@@ -6,6 +6,7 @@ import os
 import time
 import datetime
 from zipfile import ZipFile
+from cli_config import CliConfig
 
 
 def check_arg(args=None):
@@ -50,6 +51,7 @@ class LambdaCronCLI:
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
+        self.cli_config = CliConfig(self.cli.environment)
 
     def get_tmp_directory(self):
         return '/tmp/lambda_cron_{environment}'.format(environment=self.cli.environment)
