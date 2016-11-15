@@ -26,7 +26,6 @@ class ConfigCli:
                 self.bucket = self.config[environment]['bucket']
             elif 'all' in self.config:
                 if '{environment}' in self.config['all']['bucket']:
-                    print 'yeah !'
                     self.bucket = self.config['all']['bucket'].format(environment=environment)
                 else:
                     self.bucket = self.config['all']['bucket']+"-{}".format(environment)

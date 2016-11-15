@@ -26,6 +26,10 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='DISABLED')
 
+    deploy_command = commands_parser.add_parser('delete')
+    deploy_command.add_argument('-e', '--environment', required=True)
+    deploy_command.add_argument('-s', '--state', default='DISABLED')
+
     return parser.parse_args(args)
 
 
@@ -52,10 +56,10 @@ class LambdaCronCLI:
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
-        self.cli_config = ConfigCli(self.cli.environment)
+        self.config = ConfigCli(self.cli.environment)
 
     def get_tmp_directory(self):
-        return '/tmp/lambda_cron_{environment}'.format(environment=self.cli.environment)
+        return '/tmp/LambdaCron-{environment}'.format(environment=self.cli.environment)
 
     def get_dependencies_directory(self):
         return os.path.join(self.get_tmp_directory(), 'dependencies')
@@ -64,7 +68,7 @@ class LambdaCronCLI:
         return "code_{}.zip".format(self.timestamp)
 
     def get_code_zip_file_path(self):
-        return os.path.join(self.get_tmp_directory(), self.get_code_zip_file_name())
+        return os.path.abspath(os.path.join(self.get_tmp_directory(), self.get_code_zip_file_name()))
 
     def get_stack_name(self):
         return "LambdaCron-{environment}".format(environment=self.cli.environment)
@@ -88,7 +92,7 @@ class LambdaCronCLI:
             zip_file.write(os.path.join(get_lambda_cron_directory(), 'main.py'), 'main.py')
 
     def upload_code_to_s3(self):
-        s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.cli_config.bucket,
+        s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.config.bucket,
                                                             file=self.get_code_zip_file_name())
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
         subprocess.call(s3_upload_command)
@@ -98,6 +102,7 @@ class LambdaCronCLI:
             "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
             "--parameters", self.get_code_key_parameter(is_new_deploy=True),
+            "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
@@ -121,6 +126,7 @@ class LambdaCronCLI:
             "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
             "--parameters", self.get_code_key_parameter(is_new_deploy),
+            "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
@@ -145,6 +151,21 @@ class LambdaCronCLI:
 
     def update(self):
         self.update_stack()
+
+    def delete(self):
+        delete_stack_command = [
+            "aws", "cloudformation", "delete-stack",
+            "--stack-name", self.get_stack_name(),
+            "--region", "us-east-1"
+        ]
+        subprocess.call(delete_stack_command)
+
+        wait_update_stack_command = [
+            "aws", "cloudformation", "wait", "stack-delete-complete",
+            "--stack-name", self.get_stack_name(),
+            "--region", "us-east-1"
+        ]
+        subprocess.call(wait_update_stack_command)
 
     def invoke(self):
         payload = "{\"source\": \"FINP Dev\", \"time\": \"${time}\", \"resources\": [\"Manual:invoke/LambdaCron-${environment}-LambdaCronHourlyEvent-ZZZ\"]}".format(

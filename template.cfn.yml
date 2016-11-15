@@ -1,4 +1,7 @@
 Parameters:
+  Bucket:
+    Type: String
+    Description: Bucket used to store code and tasks
   CodeS3Key:
     Type: String
     Description: Location of the most recent version of the lambda code
@@ -25,7 +28,7 @@ Resources:
     Properties:
       FunctionName: !Sub LambdaCron-${Environment}
       Code:
-        S3Bucket: !Sub lambda-cron.${Environment}.mmknox
+        S3Bucket: !Ref Bucket
         S3Key: !Ref CodeS3Key
       Handler: main.handler
       MemorySize: 128
@@ -60,11 +63,11 @@ Resources:
           - Effect: Allow
             Action:
               - s3:ListBucket
-            Resource: !Sub arn:aws:s3:::lambda-cron.${Environment}.mmknox
+            Resource: !Sub arn:aws:s3:::${Bucket}
           - Effect: Allow
             Action:
               - s3:GetObject
-            Resource: !Sub arn:aws:s3:::lambda-cron.${Environment}.mmknox/tasks/*
+            Resource: !Sub arn:aws:s3:::${Bucket}/tasks/*
           - Effect: Allow
             Action:
               - sqs:SendMessage
