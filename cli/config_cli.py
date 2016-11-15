@@ -9,14 +9,6 @@ def get_project_root_directory():
     return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../'))
 
 
-def get_lambda_cron_directory():
-    return os.path.join(get_project_root_directory(), '../lambda_cron')
-
-
-def get_lambda_cron_path(sub_path):
-    return os.path.join(get_lambda_cron_directory(), sub_path)
-
-
 def get_cli_config_file_path():
     return os.path.join(get_project_root_directory(), 'config/cli.yml')
 
@@ -33,4 +25,8 @@ class ConfigCli:
             if environment in self.config:
                 self.bucket = self.config[environment]['bucket']
             elif 'all' in self.config:
-                self.bucket = self.config['all']['bucket']+"-{}".format(environment)
+                if '{environment}' in self.config['all']['bucket']:
+                    print 'yeah !'
+                    self.bucket = self.config['all']['bucket'].format(environment=environment)
+                else:
+                    self.bucket = self.config['all']['bucket']+"-{}".format(environment)

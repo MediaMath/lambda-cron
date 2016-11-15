@@ -7,6 +7,7 @@ import time
 import datetime
 from zipfile import ZipFile
 from config_cli import ConfigCli
+import config_cli
 
 
 def check_arg(args=None):
@@ -28,12 +29,12 @@ def check_arg(args=None):
     return parser.parse_args(args)
 
 
-def get_project_directory():
-    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../lambda_cron'))
+def get_lambda_cron_directory():
+    return os.path.abspath(os.path.join(config_cli.get_project_root_directory(), 'lambda_cron'))
 
 
-def get_project_path(sub_path):
-    return os.path.join(get_project_directory(), sub_path)
+def get_lambda_cron_path(sub_path):
+    return os.path.join(get_lambda_cron_directory(), sub_path)
 
 
 def zip_dir(zip_file, path, prefix=''):
@@ -68,11 +69,9 @@ class LambdaCronCLI:
     def get_stack_name(self):
         return "LambdaCron-{environment}".format(environment=self.cli.environment)
 
-    def get_bucket_name(self):
-        return "lambda_cron.{environment}.mmknox".format(environment=self.cli.environment)
-
     def install_dependencies(self):
-        pip_install_command = ["pip", "install", "--requirement", get_project_path('requirements.txt'), "--target",
+        pip_install_command = ["pip", "install", "--requirement",
+                               os.path.join(config_cli.get_project_root_directory(), 'requirements.txt'), "--target",
                                self.get_dependencies_directory(), "--ignore-installed"]
         os.mkdir(self.get_dependencies_directory())
         subprocess.call(pip_install_command)
@@ -85,25 +84,24 @@ class LambdaCronCLI:
         self.install_dependencies()
         with ZipFile(self.get_code_zip_file_path(), 'w') as zip_file:
             zip_dir(zip_file, self.get_dependencies_directory())
-            zip_dir(zip_file, get_project_path('lib'), 'lib')
-            zip_file.write(get_project_path('main.py'), 'main.py')
+            zip_dir(zip_file, os.path.join(get_lambda_cron_directory(), 'lib'), 'lib')
+            zip_file.write(os.path.join(get_lambda_cron_directory(), 'main.py'), 'main.py')
 
     def upload_code_to_s3(self):
-        s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.get_bucket_name(),
-                                                             file=self.get_code_zip_file_name())
+        s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.cli_config.bucket,
+                                                            file=self.get_code_zip_file_name())
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
         subprocess.call(s3_upload_command)
 
     def create_stack(self):
         update_stack_command = [
             "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
-            "--template-body", "file://{}".format(get_project_path('template.cfn.yml')),
+            "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
             "--parameters", self.get_code_key_parameter(is_new_deploy=True),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
         ]
-        print update_stack_command
         subprocess.call(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
@@ -121,13 +119,12 @@ class LambdaCronCLI:
     def update_stack(self, is_new_deploy=False):
         update_stack_command = [
             "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
-            "--template-body", "file://{}".format(get_project_path('template.cfn.yml')),
+            "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
             "--parameters", self.get_code_key_parameter(is_new_deploy),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
         ]
-        print update_stack_command
         subprocess.call(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",
@@ -137,10 +134,9 @@ class LambdaCronCLI:
         subprocess.call(wait_update_stack_command)
 
     def create(self):
-        print get_project_directory()
         self.zip_code()
-        # self.upload_code_to_s3()
-        # self.create_stack()
+        self.upload_code_to_s3()
+        self.create_stack()
 
     def deploy(self):
         self.zip_code()
