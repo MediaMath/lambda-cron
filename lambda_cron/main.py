@@ -9,6 +9,7 @@ import logging
 import boto3
 import yaml
 import re
+import os
 import traceback
 from lib.cron_checker import CronChecker
 from lib.task_runner import TaskRunner
@@ -17,9 +18,13 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
-BUCKET_PATTERN = "lambda_cron.{}.mmknox"
 QUEUE_PATTERN = "preakness-{}"
 TASKS_PREFIX = 'tasks/'
+
+
+def read_config():
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.yml'), 'r') as config_file:
+        return yaml.load(config_file)
 
 
 def get_environment_from_event(event):
@@ -33,9 +38,11 @@ def handler(event, _):
     """ Main function """
     logger.info(event)
 
+    config = read_config()
+    logger.info(config)
     environment = get_environment_from_event(event)
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket(BUCKET_PATTERN.format(environment))
+    bucket = s3.Bucket(config['bucket'])
     sqs = boto3.resource('sqs')
     queue = sqs.get_queue_by_name(QueueName=QUEUE_PATTERN.format(environment))
 

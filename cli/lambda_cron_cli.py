@@ -31,6 +31,9 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='DISABLED')
 
+    deploy_command = commands_parser.add_parser('invoke')
+    deploy_command.add_argument('-e', '--environment', required=True)
+
     return parser.parse_args(args)
 
 
@@ -181,15 +184,15 @@ class LambdaCronCLI:
         subprocess.call(wait_update_stack_command)
 
     def invoke(self):
-        payload = "{\"source\": \"FINP Dev\", \"time\": \"${time}\", \"resources\": [\"Manual:invoke/LambdaCron-${environment}-LambdaCronHourlyEvent-ZZZ\"]}".format(
+        payload_content = "\"source\": \"FINP Dev\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}-LambdaCronHourlyEvent-ZZZ\"]".format(
             time=datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
             environment=self.cli.environment
         )
         invoke_command = [
             "aws", "lambda", "invoke",
             "--invocation-type", "Event",
-            "--function-name", "LambdaCron-${environment}".format(environment=self.cli.environment),
-            "--payload", payload,
+            "--function-name", self.get_stack_name(),
+            "--payload", '{'+payload_content+'}',
             os.path.join(self.get_tmp_directory(), 'invoke_output.txt')
         ]
         subprocess.call(invoke_command)
