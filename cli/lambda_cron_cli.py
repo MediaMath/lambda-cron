@@ -8,6 +8,7 @@ import datetime
 from zipfile import ZipFile
 from config_cli import ConfigCli
 import config_cli
+import yaml
 
 
 def check_arg(args=None):
@@ -70,6 +71,9 @@ class LambdaCronCLI:
     def get_code_zip_file_path(self):
         return os.path.abspath(os.path.join(self.get_tmp_directory(), self.get_code_zip_file_name()))
 
+    def get_config_file_path(self):
+        return os.path.abspath(os.path.join(self.get_tmp_directory(), 'config.yml'))
+
     def get_stack_name(self):
         return "LambdaCron-{environment}".format(environment=self.cli.environment)
 
@@ -80,16 +84,25 @@ class LambdaCronCLI:
         os.mkdir(self.get_dependencies_directory())
         subprocess.call(pip_install_command)
 
+    def generate_config(self):
+        config_dir = {
+            'bucket': self.config.bucket
+        }
+        with open(self.get_config_file_path(), 'w') as outfile:
+            yaml.dump(config_dir, outfile, default_flow_style=False)
+
     def zip_code(self):
         tmp_directory = self.get_tmp_directory()
         if os.path.exists(tmp_directory):
             shutil.rmtree(tmp_directory)
         os.mkdir(tmp_directory)
         self.install_dependencies()
+        self.generate_config()
         with ZipFile(self.get_code_zip_file_path(), 'w') as zip_file:
             zip_dir(zip_file, self.get_dependencies_directory())
             zip_dir(zip_file, os.path.join(get_lambda_cron_directory(), 'lib'), 'lib')
             zip_file.write(os.path.join(get_lambda_cron_directory(), 'main.py'), 'main.py')
+            zip_file.write(self.get_config_file_path(), 'config.yml')
 
     def upload_code_to_s3(self):
         s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.config.bucket,
