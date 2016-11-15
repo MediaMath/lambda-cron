@@ -1,0 +1,5 @@
+all:
+  bucket: 'test-bucket-all'
+
+prod:
+  bucket: 'test-bucket-custom'

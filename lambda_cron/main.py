@@ -17,7 +17,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
-BUCKET_PATTERN = "lambda-cron.{}.mmknox"
+BUCKET_PATTERN = "lambda_cron.{}.mmknox"
 QUEUE_PATTERN = "preakness-{}"
 TASKS_PREFIX = 'tasks/'
 

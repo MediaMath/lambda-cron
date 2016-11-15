@@ -6,7 +6,7 @@ import os
 import time
 import datetime
 from zipfile import ZipFile
-from cli_config import CliConfig
+from config_cli import ConfigCli
 
 
 def check_arg(args=None):
@@ -29,7 +29,7 @@ def check_arg(args=None):
 
 
 def get_project_directory():
-    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../lambda-cron'))
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../lambda_cron'))
 
 
 def get_project_path(sub_path):
@@ -51,7 +51,7 @@ class LambdaCronCLI:
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
-        self.cli_config = CliConfig(self.cli.environment)
+        self.cli_config = ConfigCli(self.cli.environment)
 
     def get_tmp_directory(self):
         return '/tmp/lambda_cron_{environment}'.format(environment=self.cli.environment)
@@ -69,7 +69,7 @@ class LambdaCronCLI:
         return "LambdaCron-{environment}".format(environment=self.cli.environment)
 
     def get_bucket_name(self):
-        return "lambda-cron.{environment}.mmknox".format(environment=self.cli.environment)
+        return "lambda_cron.{environment}.mmknox".format(environment=self.cli.environment)
 
     def install_dependencies(self):
         pip_install_command = ["pip", "install", "--requirement", get_project_path('requirements.txt'), "--target",

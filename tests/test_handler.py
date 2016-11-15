@@ -1,5 +1,5 @@
 import pytest
-import main
+import lambda_cron.main as main
 
 
 def test_get_environment_staging():

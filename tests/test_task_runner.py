@@ -1,7 +1,7 @@
 import pytest
 import json
-from lib.task_runner import TaskRunner
-from lib.cron_checker import CronChecker
+from lambda_cron.lib.task_runner import TaskRunner
+from lambda_cron.lib.cron_checker import CronChecker
 
 
 MESSAGE_BODY =\
