@@ -1,25 +1,47 @@
 [![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
-
-# Knox Lambda Cron
+# LambdaCron
 
 Project to run scheduled tasks using lambda functions on AWS.
 
-![diagram](/diagram.png)
+Lambda function will run periodically (can be customized) and it will run
+the tasks scheduled for current period.
 
-Lamdba function will run once an hour, it will read all tasks available and it
-will run all jobs that should run in that hour.
-Tasks will run on [Preakness](https://github.com/MediaMath/preakness). JSON (YAML) object
-defined under **task** key will be sent to *Preakness* SQS queue.
+**LambdaCron** provide different type of actions to trigger with the tasks:
 
-Tasks are saved in a S3 bucket:
+* Send message to SQS queue.
+* Invoke lambda function.
+* HTTP requests (GET & POST)
 
-```
-s3://lambda-cron.prod.mmknox/tasks/
-```
+Tasks are YAML files stored on a S3 bucket and they will define frequency
+of the task (cron expression) and the action to do.
 
-Task are defined in [knox-lambda-cron-tasks](https://github.com/MediaMath/knox-lambda-cron-tasks)
+## LambdaCron CLI
 
-#### Sample Task Definition
+**LambdaCron** provide a CLI tool that allow to run multiple environments
+with different settings.
+
+Some of the setting that are allowed to set are:
+
+* Bucket to store tasks and lambda function code.
+* Frequency
+
+This settings can be customized for each environment. As many environments
+as desired can be set up.
+
+### CLI commands
+
+* **create**: Create new **LambdaCron** environment in the AWS account
+  * **--environment (-e)**: Environment to work with (string)
+  * **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
+* **update**: Update new settings for the environment.
+  * **--environment (-e)**: Environment to work with (string)
+  * **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
+* **invoke**: Invoke lambda function manually
+  * **--environment (-e)**: Environment to work with (string)
+* **delete**: Delete **LambdaCron** environment from the AWS account
+  * **--environment (-e)**: Environment to work with (string)
+
+## Tasks
 
 ``` yaml
 name: sample name
@@ -36,32 +58,6 @@ Project is running 100% with AWS resources and they are defined using CloudForma
 The the template defined a stack will be created in AWS and it will be managed using
 CloudFormation tools.
 
-#### Makefile
-The Makefile contains all the instructions needed to work with the project:
-
-* **init**: Initialize environment
-* **deploy**: Deploy code to S3 and update stack in AWS
-* **update-stack**: Update stack in AWS
-* **invoke**: Invoke Lambda function in AWS
-* **test**: Run tests
-* **list**: List stack's resources in AWS
-* **events**: Describe stack's events in AWS
-* **validate**: Validate CloudFormation template
-* **summary**: Get CloudFormation tempalte summary
-* **delete-stack**: Delete stack in AWS
-
-#### Deployment
-The project is working with Travis CI as Continuous Integration environment. All commits are
-tested.
-
-Project is deployed automatically under following criteria:
-
-* Branch **develop**: deploy sandbox
-* Branch **staging**: deploy staging
-* New **tag** version: deploy prod
-
-## Local Setup
-
 ### Requirements
 - Python 2.7
 - Virtual Environment
@@ -70,26 +66,14 @@ Project is deployed automatically under following criteria:
   - Boto3 is installed as part of the lambda functions Environment.  To aviod the overhead of including it in your deployment artifact install boto3 on your system instead of in the virtual environment
 - awscli (configured)
 
-### Setup
-From the repo root dir
-``` bash
-$ virtualenv venv
-$ pip install -r requirements.txt
-```
+## TODO
 
-## TODO & Ideas & Features
-
-* Monitoring
-    * Logs & metrics
-    * Cloudwatch alerts
-* Lambda code:
-    * Add tag name (version) to .zip file
-    * Upload .zip file directly to lambda function (not to S3) ?
-    * Add tag name (version) to lambda function description ?
-* Feature
-    * Disable crons (Expresion = DISABLED)
-    * Read only reports that must run
-    * Be able to use variables in task definition: dates.
+* Cron:
+    * Task to invoke Lambda functions
+    * Task to send HTTP requests
+    * Allow customized frequency
+    * Template system for task definitions.
+* CLI
+    * Allow customized frequency
+    * Allow to use different AWS profiles.
     
-## Diagram
-The diagram was created with draw.io, using the lambda-cron.xml file in this repo
