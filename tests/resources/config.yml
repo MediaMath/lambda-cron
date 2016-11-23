@@ -1,13 +1,22 @@
 all:
   bucket: 'test-bucket-all-{environment}'
   alarm: False
+  every:
+    hours: 2
 
 prod:
   bucket: 'test-bucket-custom'
   alarm: True
+  every:
+    minutes: 5
 
 staging:
   not_used_key: not_used_value
 
 alarm_bad_value:
   alarm: bad
+
+frequency_error:
+  every:
+    minutes: 5
+    hours: 1
