@@ -13,19 +13,37 @@ def get_cli_config_file_path():
     return os.path.join(get_project_root_directory(), 'config/cli.yml')
 
 
+def load_config():
+    if os.path.exists(get_cli_config_file_path()):
+        with open(get_cli_config_file_path(), 'r') as config_file:
+            return yaml.load(config_file)
+    return None
+
+
 class ConfigCli:
 
     def __init__(self, environment):
-        self.bucket = DEFAULT_BUCKET_PATTERN.format(environment=environment)
+        self.environment = environment
+        self.bucket = DEFAULT_BUCKET_PATTERN.format(environment=self.environment)
+        self.alarm = False
 
-        self.config = None
-        if os.path.exists(get_cli_config_file_path()):
-            with open(get_cli_config_file_path(), 'r') as config_file:
-                self.config = yaml.load(config_file)
-            if environment in self.config:
-                self.bucket = self.config[environment]['bucket']
-            elif 'all' in self.config:
-                if '{environment}' in self.config['all']['bucket']:
-                    self.bucket = self.config['all']['bucket'].format(environment=environment)
-                else:
-                    self.bucket = self.config['all']['bucket']+"-{}".format(environment)
+        self.config = load_config()
+        self.set_bucket()
+        self.set_alarm()
+
+    def set_alarm(self):
+        if self.config and (self.environment in self.config) and ('alarm' in self.config[self.environment]):
+            self.alarm = self.config[self.environment]['alarm']
+        elif self.config and ('all' in self.config) and ('alarm' in self.config['all']):
+            self.alarm = self.config['all']['alarm']
+
+    def set_bucket(self):
+        if self.config and (self.environment in self.config) and ('bucket' in self.config[self.environment]):
+            self.bucket = self.config[self.environment]['bucket']
+        elif self.config and ('all' in self.config) and ('bucket' in self.config['all']):
+            if '{environment}' in self.config['all']['bucket']:
+                self.bucket = self.config['all']['bucket'].format(environment=self.environment)
+            else:
+                self.bucket = self.config['all']['bucket'] + "-{}".format(self.environment)
+
+

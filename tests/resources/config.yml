@@ -1,5 +1,13 @@
 all:
   bucket: 'test-bucket-all'
+  alarm: False
 
 prod:
   bucket: 'test-bucket-custom'
+  alarm: True
+
+staging:
+  not_used_key: not_used_value
+
+bad_alarm:
+  alarm: bad
