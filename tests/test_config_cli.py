@@ -41,5 +41,5 @@ def test_should_use_global_default_settings(monkeypatch):
 
 def test_alarm_should_be_false_for_invalid_values(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', invalid_config_file_path)
-    config = cli.config_cli.ConfigCli('bad_alarm')
+    config = cli.config_cli.ConfigCli('alarm_bad_value')
     assert config.alarm == False

@@ -1,5 +1,5 @@
 all:
-  bucket: 'test-bucket-all'
+  bucket: 'test-bucket-all-{environment}'
   alarm: False
 
 prod:
@@ -9,5 +9,5 @@ prod:
 staging:
   not_used_key: not_used_value
 
-bad_alarm:
+alarm_bad_value:
   alarm: bad
