@@ -18,6 +18,7 @@ def check_arg(args=None):
     deploy_command = commands_parser.add_parser('create')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('deploy')
     deploy_command.add_argument('-e', '--environment', required=True)
@@ -90,6 +91,12 @@ class LambdaCronCLI:
     def exec_command(self, command):
         subprocess.call(command)
 
+    def exec_aws_command(self, command):
+        if self.cli.aws_profile:
+            command.append('--profile')
+            command.append(self.cli.aws_profile)
+        self.exec_command(command)
+
     def generate_config(self):
         config_dir = {
             'bucket': self.config.bucket
@@ -126,25 +133,26 @@ class LambdaCronCLI:
         s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.config.bucket,
                                                             file=self.get_code_zip_file_name())
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
-        self.exec_command(s3_upload_command)
+        self.exec_aws_command(s3_upload_command)
 
     def create_stack(self):
-        update_stack_command = [
+        create_stack_command = [
             "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
             "--parameters", self.get_code_key_parameter(is_new_deploy=True),
             "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
-            "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
+            "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
+            "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
-        self.exec_command(update_stack_command)
-        wait_update_stack_command = [
+        self.exec_aws_command(create_stack_command)
+        wait_create_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        self.exec_command(wait_update_stack_command)
+        self.exec_aws_command(wait_create_stack_command)
 
     def get_code_key_parameter(self, is_new_deploy=False):
         if is_new_deploy:
