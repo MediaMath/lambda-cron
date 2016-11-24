@@ -162,8 +162,7 @@ class LambdaCronCLI:
         self.exec_aws_command(create_stack_command)
         wait_create_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
-            "--stack-name", self.get_stack_name(),
-            "--region", "us-east-1"
+            "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(wait_create_stack_command)
 
@@ -182,13 +181,12 @@ class LambdaCronCLI:
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
-            "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
+            "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
         self.exec_aws_command(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",
-            "--stack-name", self.get_stack_name(),
-            "--region", "us-east-1"
+            "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(wait_update_stack_command)
 
@@ -208,15 +206,13 @@ class LambdaCronCLI:
     def delete(self):
         delete_stack_command = [
             "aws", "cloudformation", "delete-stack",
-            "--stack-name", self.get_stack_name(),
-            "--region", "us-east-1"
+            "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(delete_stack_command)
 
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-delete-complete",
-            "--stack-name", self.get_stack_name(),
-            "--region", "us-east-1"
+            "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(wait_update_stack_command)
 
