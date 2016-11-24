@@ -85,7 +85,10 @@ class LambdaCronCLI:
                                os.path.join(config_cli.get_project_root_directory(), 'requirements.txt'), "--target",
                                self.get_dependencies_directory(), "--ignore-installed"]
         os.mkdir(self.get_dependencies_directory())
-        subprocess.call(pip_install_command)
+        self.exec_command(pip_install_command)
+
+    def exec_command(self, command):
+        subprocess.call(command)
 
     def generate_config(self):
         config_dir = {
@@ -123,7 +126,7 @@ class LambdaCronCLI:
         s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.config.bucket,
                                                             file=self.get_code_zip_file_name())
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
-        subprocess.call(s3_upload_command)
+        self.exec_command(s3_upload_command)
 
     def create_stack(self):
         update_stack_command = [
@@ -135,13 +138,13 @@ class LambdaCronCLI:
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
         ]
-        subprocess.call(update_stack_command)
+        self.exec_command(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        subprocess.call(wait_update_stack_command)
+        self.exec_command(wait_update_stack_command)
 
     def get_code_key_parameter(self, is_new_deploy=False):
         if is_new_deploy:
@@ -159,13 +162,13 @@ class LambdaCronCLI:
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
         ]
-        subprocess.call(update_stack_command)
+        self.exec_command(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        subprocess.call(wait_update_stack_command)
+        self.exec_command(wait_update_stack_command)
 
     def create(self):
         self.zip_code()
@@ -186,14 +189,14 @@ class LambdaCronCLI:
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        subprocess.call(delete_stack_command)
+        self.exec_command(delete_stack_command)
 
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-delete-complete",
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        subprocess.call(wait_update_stack_command)
+        self.exec_command(wait_update_stack_command)
 
     def invoke(self):
         payload_content = "\"source\": \"FINP Dev\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}-LambdaCronHourlyEvent-ZZZ\"]".format(
@@ -207,7 +210,7 @@ class LambdaCronCLI:
             "--payload", '{'+payload_content+'}',
             os.path.join(self.get_tmp_directory(), 'invoke_output.txt')
         ]
-        subprocess.call(invoke_command)
+        self.exec_command(invoke_command)
 
     def run(self):
         command_method = getattr(self, self.cli.command)
