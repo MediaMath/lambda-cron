@@ -17,9 +17,14 @@ class LambdaCronCLISpy(LambdaCronCLI):
     def __init__(self, cli_instructions):
         LambdaCronCLI.__init__(self, cli_instructions)
         self.commands_list = []
+        self.lambda_function_config = {}
 
     def exec_command(self, command):
         self.commands_list.append(command)
+
+    def write_lambda_functions_config(self, config):
+        self.lambda_function_config = config
+        LambdaCronCLI.write_lambda_functions_config(self, config)
 
 
 def test_create_command(monkeypatch):
@@ -227,3 +232,45 @@ def test_add_profile_to_invoke_commands(monkeypatch):
     assert len(lambda_cron.commands_list) == 2
     assert '--profile' in lambda_cron.commands_list[0]
     assert 'my-profile' in lambda_cron.commands_list[0]
+
+
+def test_lambda_function_config(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'create'
+    cli_params.environment = 'prod'
+    cli_params.state = 'DISABLED'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    expected_config = {
+        'bucket': 'test-bucket-custom',
+        'frequency': {
+            'minutes': 5
+        }
+    }
+
+    assert lambda_cron.lambda_function_config == expected_config
+
+
+def test_lambda_function_config_II(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'create'
+    cli_params.environment = 'other'
+    cli_params.state = 'DISABLED'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    expected_config = {
+        'bucket': 'test-bucket-all-other',
+        'frequency': {
+            'hours': 2
+        }
+    }
+
+    assert lambda_cron.lambda_function_config == expected_config

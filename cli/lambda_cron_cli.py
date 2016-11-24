@@ -23,17 +23,21 @@ def check_arg(args=None):
     deploy_command = commands_parser.add_parser('deploy')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('delete')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('invoke')
     deploy_command.add_argument('-e', '--environment', required=True)
+    deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     return parser.parse_args(args)
 
@@ -98,11 +102,20 @@ class LambdaCronCLI:
         self.exec_command(command)
 
     def generate_config(self):
-        config_dir = {
-            'bucket': self.config.bucket
+        frequency_config = {}
+        if self.config.minutes:
+            frequency_config['minutes'] = self.config.minutes
+        elif self.config.hours:
+            frequency_config['hours'] = self.config.hours
+        lambda_function_config = {
+            'bucket': self.config.bucket,
+            'frequency': frequency_config
         }
+        self.write_lambda_functions_config(lambda_function_config)
+
+    def write_lambda_functions_config(self, config):
         with open(self.get_config_file_path(), 'w') as outfile:
-            yaml.dump(config_dir, outfile, default_flow_style=False)
+            yaml.dump(config, outfile, default_flow_style=False)
 
     def zip_code(self):
         tmp_directory = self.get_tmp_directory()
