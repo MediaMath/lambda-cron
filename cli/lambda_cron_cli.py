@@ -168,15 +168,16 @@ class LambdaCronCLI:
             "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
+            "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
             "--capabilities", "CAPABILITY_NAMED_IAM", "--region", "us-east-1"
         ]
-        self.exec_command(update_stack_command)
+        self.exec_aws_command(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        self.exec_command(wait_update_stack_command)
+        self.exec_aws_command(wait_update_stack_command)
 
     def create(self):
         self.zip_code()
@@ -197,14 +198,14 @@ class LambdaCronCLI:
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        self.exec_command(delete_stack_command)
+        self.exec_aws_command(delete_stack_command)
 
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-delete-complete",
             "--stack-name", self.get_stack_name(),
             "--region", "us-east-1"
         ]
-        self.exec_command(wait_update_stack_command)
+        self.exec_aws_command(wait_update_stack_command)
 
     def invoke(self):
         payload_content = "\"source\": \"FINP Dev\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}-LambdaCronHourlyEvent-ZZZ\"]".format(
@@ -218,7 +219,7 @@ class LambdaCronCLI:
             "--payload", '{'+payload_content+'}',
             os.path.join(self.get_tmp_directory(), 'invoke_output.txt')
         ]
-        self.exec_command(invoke_command)
+        self.exec_aws_command(invoke_command)
 
     def run(self):
         command_method = getattr(self, self.cli.command)
