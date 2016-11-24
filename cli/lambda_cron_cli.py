@@ -107,6 +107,18 @@ class LambdaCronCLI:
             zip_file.write(os.path.join(get_lambda_cron_directory(), 'main.py'), 'main.py')
             zip_file.write(self.get_config_file_path(), 'config.yml')
 
+    def generate_cron_expression(self):
+        if self.config.minutes:
+            if self.config.hours == 1:
+                return 'cron(* * * * ? *)'
+            else:
+                return "cron(*/{} * * * ? *)".format(self.config.minutes)
+        elif self.config.hours:
+            if self.config.hours == 1:
+                return 'cron(0 * * * ? *)'
+            else:
+                return "cron(0 */{} * * ? *)".format(self.config.hours)
+
     def upload_code_to_s3(self):
         s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.config.bucket,
                                                             file=self.get_code_zip_file_name())
