@@ -208,7 +208,7 @@ class LambdaCronCLI:
         self.exec_aws_command(wait_update_stack_command)
 
     def invoke(self):
-        payload_content = "\"source\": \"FINP Dev\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}-LambdaCronHourlyEvent-ZZZ\"]".format(
+        payload_content = "\"source\": \"LambdaCron-cli-invoke\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}\"]".format(
             time=datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
             environment=self.cli.environment
         )
