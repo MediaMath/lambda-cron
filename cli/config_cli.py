@@ -25,7 +25,8 @@ class ConfigCli:
     def __init__(self, environment):
         self.environment = environment
         self.bucket = DEFAULT_BUCKET_PATTERN.format(environment=self.environment)
-        self.alarm = False
+        self.alarm_enabled = False
+        self.alarm_email = ''
         self.hours = 1
         self.minutes = False
 
@@ -35,13 +36,20 @@ class ConfigCli:
         self.set_frequency()
 
     def set_alarm(self):
+        alarm_config = None
         if self.config and (self.environment in self.config) and ('alarm' in self.config[self.environment]):
-            self.alarm = self.config[self.environment]['alarm']
+            alarm_config = self.config[self.environment]['alarm']
         elif self.config and ('all' in self.config) and ('alarm' in self.config['all']):
-            self.alarm = self.config['all']['alarm']
+            alarm_config = self.config['all']['alarm']
 
-        if not isinstance(self.alarm, bool):
-            raise Exception("Settings from 'alarm' must be a bool value")
+        if not alarm_config:
+            return
+
+        self.alarm_enabled = alarm_config['enabled']
+        if not isinstance(self.alarm_enabled, bool):
+            raise Exception("Settings for 'alarm.enabled' must be a bool value")
+        if self.alarm_enabled:
+            self.alarm_email = alarm_config['email']
 
     def set_bucket(self):
         if self.config and (self.environment in self.config) and ('bucket' in self.config[self.environment]):
@@ -63,7 +71,7 @@ class ConfigCli:
             return
 
         if ('hours' in config_every) and ('minutes' in config_every):
-            raise Exception('Only one of hours or minutes must be used for the frequency. Both are not allowed.')
+            raise Exception("Only one of 'hours' or 'minutes' must be used for the frequency. Both are not allowed.")
 
         if 'hours' in config_every:
             self.hours = config_every['hours']

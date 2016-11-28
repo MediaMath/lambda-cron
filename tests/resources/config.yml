@@ -1,12 +1,15 @@
 all:
   bucket: 'test-bucket-all-{environment}'
-  alarm: False
+  alarm:
+    enabled: False
   every:
     hours: 2
 
 prod:
   bucket: 'test-bucket-custom'
-  alarm: True
+  alarm:
+    enabled: True
+    email: my@email.com
   every:
     minutes: 5
 
@@ -14,7 +17,8 @@ staging:
   not_used_key: not_used_value
 
 alarm_bad_value:
-  alarm: bad
+  alarm:
+    enabled: bad
 
 frequency_error:
   every:
