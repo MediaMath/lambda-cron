@@ -148,17 +148,24 @@ class LambdaCronCLI:
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
         self.exec_aws_command(s3_upload_command)
 
+    def add_alarm_email_to_command(self, command):
+        command.append("ParameterKey=AlarmEmail,ParameterValue={alarm_email}".format(alarm_email=self.config.alarm_email))
+        return command
+
     def create_stack(self):
         create_stack_command = [
             "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
+            "--capabilities", "CAPABILITY_NAMED_IAM",
             "--parameters", self.get_code_key_parameter(is_new_deploy=True),
             "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
-            "--capabilities", "CAPABILITY_NAMED_IAM"
+            "ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled)
         ]
+        if self.config.alarm_enabled:
+            create_stack_command = self.add_alarm_email_to_command(create_stack_command)
         self.exec_aws_command(create_stack_command)
         wait_create_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
@@ -176,13 +183,16 @@ class LambdaCronCLI:
         update_stack_command = [
             "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
+            "--capabilities", "CAPABILITY_NAMED_IAM",
             "--parameters", self.get_code_key_parameter(is_new_deploy),
             "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
             "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
             "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
             "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
-            "--capabilities", "CAPABILITY_NAMED_IAM"
+            "ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled)
         ]
+        if self.config.alarm_enabled:
+            update_stack_command = self.add_alarm_email_to_command(update_stack_command)
         self.exec_aws_command(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",

@@ -49,6 +49,8 @@ def test_create_command(monkeypatch):
     assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[2]
     assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[2]
     assert 'ParameterKey=CronExpression,ParameterValue=cron(*/5 * * * ? *)' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEmail,ParameterValue=my@email.com' in lambda_cron.commands_list[2]
     assert '--profile' not in lambda_cron.commands_list[2]
     assert 'stack-create-complete' in lambda_cron.commands_list[3]
     assert '--profile' not in lambda_cron.commands_list[3]
@@ -96,6 +98,8 @@ def test_deploy_command(monkeypatch):
     assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[2]
     assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[2]
     assert 'ParameterKey=CronExpression,ParameterValue=cron(*/5 * * * ? *)' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEmail,ParameterValue=my@email.com' in lambda_cron.commands_list[2]
     assert '--profile' not in lambda_cron.commands_list[2]
     assert 'stack-update-complete' in lambda_cron.commands_list[3]
     assert '--profile' not in lambda_cron.commands_list[3]
@@ -140,6 +144,8 @@ def test_update_command(monkeypatch):
     assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[0]
     assert 'ParameterKey=State,ParameterValue=ENABLED' in lambda_cron.commands_list[0]
     assert 'ParameterKey=CronExpression,ParameterValue=cron(*/5 * * * ? *)' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmEmail,ParameterValue=my@email.com' in lambda_cron.commands_list[0]
     assert '--profile' not in lambda_cron.commands_list[0]
     assert 'stack-update-complete' in lambda_cron.commands_list[1]
     assert '--profile' not in lambda_cron.commands_list[1]
@@ -274,3 +280,32 @@ def test_lambda_function_config_II(monkeypatch):
     }
 
     assert lambda_cron.lambda_function_config == expected_config
+
+
+def test_deploy_command_other_env(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'deploy'
+    cli_params.environment = 'other'
+    cli_params.state = 'DISABLED'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 4
+    assert 'pip' in lambda_cron.commands_list[0]
+    assert 's3' in lambda_cron.commands_list[1] and 'cp' in lambda_cron.commands_list[1]
+    assert 's3://test-bucket-all-other' in lambda_cron.commands_list[1][4]
+    assert '--profile' not in lambda_cron.commands_list[1]
+    assert 'update-stack' in lambda_cron.commands_list[2]
+    assert 'LambdaCron-other' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=Bucket,ParameterValue=test-bucket-all-other' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=Environment,ParameterValue=other' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=CronExpression,ParameterValue=cron(0 */2 * * ? *)' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEnabled,ParameterValue=False' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEmail,ParameterValue=' not in lambda_cron.commands_list[2]
+    assert '--profile' not in lambda_cron.commands_list[2]
+    assert 'stack-update-complete' in lambda_cron.commands_list[3]
+    assert '--profile' not in lambda_cron.commands_list[3]
