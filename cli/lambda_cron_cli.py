@@ -148,10 +148,6 @@ class LambdaCronCLI:
         s3_upload_command = ["aws", "s3", "cp", self.get_code_zip_file_path(), s3_target_path]
         self.exec_aws_command(s3_upload_command)
 
-    def add_alarm_email_to_command(self, command):
-        command.append("ParameterKey=AlarmEmail,ParameterValue={alarm_email}".format(alarm_email=self.config.alarm_email))
-        return command
-
     def is_deploy_needed(self):
         return (self.cli.command == 'deploy') or (self.cli.command == 'create')
 
@@ -163,6 +159,8 @@ class LambdaCronCLI:
         command.append("ParameterKey=State,ParameterValue={state}".format(state=self.cli.state)),
         command.append("ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()))
         command.append("ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled))
+        if self.config.alarm_enabled:
+            command.append("ParameterKey=AlarmEmail,ParameterValue={alarm_email}".format(alarm_email=self.config.alarm_email))
         return command
 
     def create_stack(self):
@@ -172,8 +170,7 @@ class LambdaCronCLI:
             "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
         create_stack_command = self.add_template_parameters(create_stack_command)
-        if self.config.alarm_enabled:
-            create_stack_command = self.add_alarm_email_to_command(create_stack_command)
+
         self.exec_aws_command(create_stack_command)
         wait_create_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
@@ -194,8 +191,6 @@ class LambdaCronCLI:
             "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
         update_stack_command = self.add_template_parameters(update_stack_command)
-        if self.config.alarm_enabled:
-            update_stack_command = self.add_alarm_email_to_command(update_stack_command)
         self.exec_aws_command(update_stack_command)
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",
