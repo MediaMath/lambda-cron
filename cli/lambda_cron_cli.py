@@ -130,7 +130,7 @@ class LambdaCronCLI:
             zip_file.write(os.path.join(get_lambda_cron_directory(), 'main.py'), 'main.py')
             zip_file.write(self.get_config_file_path(), 'config.yml')
 
-    def generate_cron_expression(self):
+    def get_cron_expression(self):
         if self.config.minutes:
             if self.config.hours == 1:
                 return 'cron(* * * * ? *)'
@@ -141,6 +141,11 @@ class LambdaCronCLI:
                 return 'cron(0 * * * ? *)'
             else:
                 return "cron(0 */{} * * ? *)".format(self.config.hours)
+
+    def get_alarm_period(self):
+        if self.config.minutes:
+            return self.config.minutes * 60
+        return self.config.hours * 3600
 
     def upload_code_to_s3(self):
         s3_target_path = "s3://{bucket}/code/{file}".format(bucket=self.config.bucket,
@@ -157,10 +162,11 @@ class LambdaCronCLI:
         command.append("ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket))
         command.append("ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment))
         command.append("ParameterKey=State,ParameterValue={state}".format(state=self.cli.state)),
-        command.append("ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()))
+        command.append("ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.get_cron_expression()))
         command.append("ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled))
         if self.config.alarm_enabled:
             command.append("ParameterKey=AlarmEmail,ParameterValue={alarm_email}".format(alarm_email=self.config.alarm_email))
+            command.append("ParameterKey=AlarmPeriod,ParameterValue={alarm_period}".format(alarm_period=self.get_alarm_period()))
         return command
 
     def create_stack(self):
