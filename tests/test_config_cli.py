@@ -51,11 +51,18 @@ def test_should_use_global_default_settings(monkeypatch):
     assert config.hours == 1
 
 
-def test_alarm_should_be_false_for_invalid_values(monkeypatch):
+def test_alarm_raise_exception_when_invalid_values_for_enabled(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     with pytest.raises(Exception) as exception_info:
-        cli.config_cli.ConfigCli('alarm_bad_value')
+        cli.config_cli.ConfigCli('alarm_enabled_bad_value')
     assert "Settings for 'alarm.enabled' must be a bool value" in str(exception_info.value)
+
+
+def test_alarm_raise_exception_when_alarm_enabled_and_no_email(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    with pytest.raises(Exception) as exception_info:
+        cli.config_cli.ConfigCli('alarm_enabled_no_email')
+    assert "Email must be provided when alarm is enabled" in str(exception_info.value)
 
 
 def test_frequency_raise_exeption_using_hours_and_minutes(monkeypatch):

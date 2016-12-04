@@ -49,6 +49,8 @@ class ConfigCli:
         if not isinstance(self.alarm_enabled, bool):
             raise Exception("Settings for 'alarm.enabled' must be a bool value")
         if self.alarm_enabled:
+            if 'email' not in alarm_config:
+                raise Exception("Email must be provided when alarm is enabled")
             self.alarm_email = alarm_config['email']
 
     def set_bucket(self):

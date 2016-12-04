@@ -16,9 +16,13 @@ prod:
 staging:
   not_used_key: not_used_value
 
-alarm_bad_value:
+alarm_enabled_bad_value:
   alarm:
     enabled: bad
+
+alarm_enabled_no_email:
+  alarm:
+    enabled: True
 
 frequency_error:
   every:
