@@ -132,7 +132,7 @@ class LambdaCronCLI:
 
     def get_cron_expression(self):
         if self.config.minutes:
-            if self.config.hours == 1:
+            if self.config.minutes == 1:
                 return 'cron(* * * * ? *)'
             else:
                 return "cron(*/{} * * * ? *)".format(self.config.minutes)

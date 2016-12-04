@@ -313,3 +313,63 @@ def test_deploy_command_other_env(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[2]
     assert 'stack-update-complete' in lambda_cron.commands_list[3]
     assert '--profile' not in lambda_cron.commands_list[3]
+
+
+def test_deploy_command_test_env(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'deploy'
+    cli_params.environment = 'test'
+    cli_params.state = 'DISABLED'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 4
+    assert 'pip' in lambda_cron.commands_list[0]
+    assert 's3' in lambda_cron.commands_list[1] and 'cp' in lambda_cron.commands_list[1]
+    assert 's3://test-bucket-all-test' in lambda_cron.commands_list[1][4]
+    assert '--profile' not in lambda_cron.commands_list[1]
+    assert 'update-stack' in lambda_cron.commands_list[2]
+    assert 'LambdaCron-test' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=Bucket,ParameterValue=test-bucket-all-test' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=Environment,ParameterValue=test' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=CronExpression,ParameterValue=cron(* * * * ? *)' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEmail,ParameterValue=test@email.com' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmPeriod,ParameterValue=60' in lambda_cron.commands_list[2]
+    assert '--profile' not in lambda_cron.commands_list[2]
+    assert 'stack-update-complete' in lambda_cron.commands_list[3]
+    assert '--profile' not in lambda_cron.commands_list[3]
+
+
+def test_deploy_command_develop_env(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'deploy'
+    cli_params.environment = 'develop'
+    cli_params.state = 'DISABLED'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 4
+    assert 'pip' in lambda_cron.commands_list[0]
+    assert 's3' in lambda_cron.commands_list[1] and 'cp' in lambda_cron.commands_list[1]
+    assert 's3://test-bucket-all-develop' in lambda_cron.commands_list[1][4]
+    assert '--profile' not in lambda_cron.commands_list[1]
+    assert 'update-stack' in lambda_cron.commands_list[2]
+    assert 'LambdaCron-develop' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=Bucket,ParameterValue=test-bucket-all-develop' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=Environment,ParameterValue=develop' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=CronExpression,ParameterValue=cron(0 * * * ? *)' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmEmail,ParameterValue=develop@email.com' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=AlarmPeriod,ParameterValue=3600' in lambda_cron.commands_list[2]
+    assert '--profile' not in lambda_cron.commands_list[2]
+    assert 'stack-update-complete' in lambda_cron.commands_list[3]
+    assert '--profile' not in lambda_cron.commands_list[3]

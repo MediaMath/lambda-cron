@@ -16,6 +16,20 @@ prod:
 staging:
   not_used_key: not_used_value
 
+test:
+  every:
+    minutes: 1
+  alarm:
+    enabled: True
+    email: test@email.com
+
+develop:
+  every:
+    hours: 1
+  alarm:
+    enabled: True
+    email: develop@email.com
+
 alarm_enabled_bad_value:
   alarm:
     enabled: bad
