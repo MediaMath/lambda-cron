@@ -152,18 +152,26 @@ class LambdaCronCLI:
         command.append("ParameterKey=AlarmEmail,ParameterValue={alarm_email}".format(alarm_email=self.config.alarm_email))
         return command
 
+    def is_deploy_needed(self):
+        return (self.cli.command == 'deploy') or (self.cli.command == 'create')
+
+    def add_template_parameters(self, command):
+        command.append("--parameters")
+        command.append(self.get_code_key_parameter(self.is_deploy_needed()))
+        command.append("ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket))
+        command.append("ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment))
+        command.append("ParameterKey=State,ParameterValue={state}".format(state=self.cli.state)),
+        command.append("ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()))
+        command.append("ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled))
+        return command
+
     def create_stack(self):
         create_stack_command = [
             "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
-            "--capabilities", "CAPABILITY_NAMED_IAM",
-            "--parameters", self.get_code_key_parameter(is_new_deploy=True),
-            "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
-            "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
-            "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
-            "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
-            "ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled)
+            "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
+        create_stack_command = self.add_template_parameters(create_stack_command)
         if self.config.alarm_enabled:
             create_stack_command = self.add_alarm_email_to_command(create_stack_command)
         self.exec_aws_command(create_stack_command)
@@ -179,18 +187,13 @@ class LambdaCronCLI:
         else:
             return "ParameterKey=CodeS3Key,UsePreviousValue=true"
 
-    def update_stack(self, is_new_deploy=False):
+    def update_stack(self):
         update_stack_command = [
             "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
-            "--capabilities", "CAPABILITY_NAMED_IAM",
-            "--parameters", self.get_code_key_parameter(is_new_deploy),
-            "ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket),
-            "ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment),
-            "ParameterKey=State,ParameterValue={state}".format(state=self.cli.state),
-            "ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.generate_cron_expression()),
-            "ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled)
+            "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
+        update_stack_command = self.add_template_parameters(update_stack_command)
         if self.config.alarm_enabled:
             update_stack_command = self.add_alarm_email_to_command(update_stack_command)
         self.exec_aws_command(update_stack_command)
@@ -208,7 +211,7 @@ class LambdaCronCLI:
     def deploy(self):
         self.zip_code()
         self.upload_code_to_s3()
-        self.update_stack(is_new_deploy=True)
+        self.update_stack()
 
     def update(self):
         self.update_stack()
