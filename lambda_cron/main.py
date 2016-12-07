@@ -27,27 +27,17 @@ def read_config():
         return yaml.load(config_file)
 
 
-def get_environment_from_event(event):
-    m = re.search('LambdaCron-(\w*)-', event['resources'][0])
-    if m and m.group(1) in ['sandbox', 'staging', 'prod']:
-        return m.group(1)
-    raise EnvironmentError('Invalid environment: '+m.group(1))
-
-
 def handler(event, _):
     """ Main function """
     logger.info(event)
 
     config = read_config()
     logger.info(config)
-    environment = get_environment_from_event(event)
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(config['bucket'])
-    sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName=QUEUE_PATTERN.format(environment))
 
     cron_checker = CronChecker(event['time'], hour_period=1, minutes_period=0)
-    task_runner = TaskRunner(cron_checker, queue)
+    task_runner = TaskRunner(cron_checker)
 
     for obj in bucket.objects.filter(Prefix=TASKS_PREFIX):
         if obj.key == TASKS_PREFIX:
