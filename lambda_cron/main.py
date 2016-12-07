@@ -4,11 +4,9 @@
     in the tasks indicates is should be executed send it to an SQS queue.
 """
 
-import sys
 import logging
 import boto3
 import yaml
-import re
 import os
 import traceback
 from lib.cron_checker import CronChecker
@@ -16,7 +14,6 @@ from lib.task_runner import TaskRunner
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler(sys.stdout))
 
 QUEUE_PATTERN = "preakness-{}"
 TASKS_PREFIX = 'tasks/'

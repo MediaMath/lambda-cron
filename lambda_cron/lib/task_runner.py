@@ -1,5 +1,10 @@
 import json
 import boto3
+import logging
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 class TaskRunner:
@@ -9,10 +14,15 @@ class TaskRunner:
     def run(self, task):
         if self.cron_checker.should_run(task['expression']):
             command_method = getattr(self, "get_{}_task_runner".format(task['type'].lower()))
-            return command_method(task['task']).run()
+            response = command_method(task['task']).run()
+            logger.info('Task executed')
+            logger.info(response)
 
     def get_queue_task_runner(self, task):
         return QueueTask(task)
+
+    def get_lambda_task_runner(self, task):
+        return InvokeLambdaTask(task)
 
 
 class Task:
@@ -32,7 +42,7 @@ class QueueTask(Task):
         return sqs.get_queue_by_name(QueueName=self.task['queue'])
 
     def run(self):
-        self.queue.send_message(MessageBody=json.dumps(self.task['message']))
+        return self.queue.send_message(MessageBody=json.dumps(self.task['message']))
 
 
 class HttpTask(Task):
@@ -52,5 +62,15 @@ class HttpTask(Task):
 
 class InvokeLambdaTask(Task):
 
+    def __init__(self, task):
+        Task.__init__(self, task)
+        self.lambda_client = self.get_lambda_client()
+
+    def get_lambda_client(self):
+        return boto3.client('lambda')
+
     def run(self):
-        pass
+        return self.lambda_client.invoke_async(
+            FunctionName=self.task['FunctionName'],
+            InvokeArgs=json.dumps(self.task['InvokeArgs'])
+        )
