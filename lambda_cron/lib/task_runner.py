@@ -38,8 +38,9 @@ class QueueTask(Task):
         self.queue = self.get_queue()
 
     def get_queue(self):
+        queue_name = self.task['queue']
         sqs = boto3.resource('sqs')
-        return sqs.get_queue_by_name(QueueName=self.task['queue'])
+        return sqs.get_queue_by_name(QueueName=queue_name)
 
     def run(self):
         return self.queue.send_message(MessageBody=json.dumps(self.task['message']))
