@@ -48,17 +48,17 @@ class QueueTask(Task):
 
 class HttpTask(Task):
 
-    def get_request(self, url):
+    def get(self, **kwargs):
         pass
 
-    def post_request(self, url, parameters):
+    def post(self, **kwargs):
         pass
 
     def run(self):
-        if self.task['method'] == 'get':
-            self.get_request(self.task['url'])
-        elif self.task['method'] == 'post':
-            self.post_request(self.task['url'], self.task['parameters'])
+        if self.task['method'].lower() == 'get':
+            self.get(self.task['url'])
+        elif self.task['method'].lower() == 'post':
+            self.post(self.task['url'], self.task['parameters'])
 
 
 class InvokeLambdaTask(Task):

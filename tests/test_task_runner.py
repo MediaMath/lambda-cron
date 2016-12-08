@@ -207,3 +207,41 @@ def test_lambda_task_invoke_args_not_defined(get_lambda_client_mock, lambda_clie
     with pytest.raises(KeyError) as exception_info:
         task_runner.run(lambda_task_definition)
     assert exception_info.match(r'InvokeArgs')
+
+
+class HttpClientSpy:
+    def __init__(self):
+        self.args = None
+        self.get = 0
+        self.post = 0
+
+    def get(self, **kwargs):
+        self.args = kwargs
+        self.get += 1
+
+    def post(self, **kwargs):
+        self.args = kwargs
+        self.post += 1
+
+
+HTTP_GET_TASK_BODY =\
+    {
+        'method': 'GET',
+        'request': {
+            'url': 'http://lambda-cron.com/tests',
+            'params': {
+                'param_1': 'param_value_1',
+                'param_2': 2
+            }
+        }
+    }
+
+
+@pytest.fixture(scope="function")
+def http_get_task_definition():
+    return {
+        'name': 'Test task',
+        'expression': '0 11 * * *',
+        'type': 'http',
+        'task': dict(HTTP_GET_TASK_BODY)
+    }
