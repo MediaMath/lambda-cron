@@ -21,9 +21,20 @@ Parameters:
   CronExpression:
     Type: String
     Description: Cron expresion for lambda funcion frequency
+  AlarmEnabled:
+    Type: String
+    AllowedValues:
+      - True
+      - False
+  AlarmEmail:
+    Type: String
+    Default: ''
+  AlarmPeriod:
+    Type: String
+    Default: ''
 
 Conditions:
-  IsProdEnvironment: !Equals [!Ref Environment, prod]
+  IsAlarmActive: !Equals [!Ref AlarmEnabled, True]
 
 Resources:
   LambdaCronFunction:
@@ -97,17 +108,17 @@ Resources:
 
   LambdaCronSNSTopic:
     Type: "AWS::SNS::Topic"
-    Condition: IsProdEnvironment
+    Condition: IsAlarmActive
     Properties:
       Subscription:
         -
-          Endpoint: "jbravo@mediamath.com"
+          Endpoint: !Ref AlarmEmail
           Protocol: "email"
       TopicName: !Sub LambdaCron-${Environment}
 
   LambdaCronAalarm:
     Type: "AWS::CloudWatch::Alarm"
-    Condition: IsProdEnvironment
+    Condition: IsAlarmActive
     Properties:
       Namespace: AWS/Lambda
       MetricName: Errors
@@ -115,7 +126,7 @@ Resources:
       Threshold: 1
       Statistic: Sum
       Unit: Count
-      Period: '3600'
+      Period: !Ref AlarmPeriod
       EvaluationPeriods: '1'
       Dimensions:
         - Name: FunctionName
