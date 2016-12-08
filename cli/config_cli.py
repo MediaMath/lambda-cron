@@ -2,7 +2,7 @@ import os
 import yaml
 
 
-DEFAULT_BUCKET_PATTERN = 'LambdaCron-{environment}'
+DEFAULT_BUCKET_PATTERN = 'lambda-cron-{environment}'
 
 
 def get_project_root_directory():

@@ -44,7 +44,7 @@ def test_should_use_custom_and_all_environment_2(monkeypatch):
 def test_should_use_global_default_settings(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', invalid_config_file_path)
     config = cli.config_cli.ConfigCli('test')
-    assert config.bucket == 'LambdaCron-test'
+    assert config.bucket == 'lambda-cron-test'
     assert config.alarm_enabled == False
     assert config.alarm_email == ''
     assert config.minutes == False
