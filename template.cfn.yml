@@ -18,12 +18,15 @@ Parameters:
       - ENABLED
       - DISABLED
     Description: State for CloudWatch event
+  CronExpression:
+    Type: String
+    Description: Cron expresion for lambda funcion frequency
 
 Conditions:
   IsProdEnvironment: !Equals [!Ref Environment, prod]
 
 Resources:
-  LambdaFunction:
+  LambdaCronFunction:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub LambdaCron-${Environment}
@@ -34,9 +37,9 @@ Resources:
       MemorySize: 128
       Runtime: python2.7
       Timeout: 60
-      Role: !GetAtt LambdaRole.Arn
+      Role: !GetAtt LambdaCronRole.Arn
 
-  LambdaRole:
+  LambdaCronRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub LambdaCron-${Environment}
@@ -78,16 +81,16 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: !Sub LambdaCron-hourly-${Environment}
-      ScheduleExpression: 'cron(0 * * * ? *)'
+      ScheduleExpression: !Sub 'cron(${CronExpression})'
       State: !Ref State
       Targets:
-        - Arn: !GetAtt LambdaFunction.Arn
+        - Arn: !GetAtt LambdaCronFunction.Arn
           Id: !Sub LambdaCron-hourly-${Environment}
 
   LambdaCronEventPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref LambdaFunction
+      FunctionName: !Ref LambdaCronFunction
       Action: lambda:InvokeFunction
       Principal: events.amazonaws.com
       SourceArn: !GetAtt LambdaCronHourlyEvent.Arn
@@ -117,20 +120,20 @@ Resources:
       Dimensions:
         - Name: FunctionName
           Value:
-            Ref: LambdaFunction
+            Ref: LambdaCronFunction
         - Name: Resource
           Value:
-            Ref: LambdaFunction
+            Ref: LambdaCronFunction
       AlarmActions:
         - Ref: LambdaCronSNSTopic
       AlarmDescription: !Sub Errors in LambdaCron ${Environment}
       ActionsEnabled: True
 
 Outputs:
-  LambdaFunction:
-    Value: !Ref LambdaFunction
-    Description: LambdaFunction
-  LambdaRole:
-    Value: !Ref LambdaRole
-    Description: LambdaRole
+  LambdaCronFunction:
+    Value: !Ref LambdaCronFunction
+    Description: LambdaCronFunction
+  LambdaCronRole:
+    Value: !Ref LambdaCronRole
+    Description: LambdaCronRole
 
