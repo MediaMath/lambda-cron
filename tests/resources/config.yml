@@ -24,6 +24,7 @@ test:
     email: test@email.com
 
 develop:
+  enabled: False
   every:
     hours: 1
   alarm:
@@ -42,3 +43,6 @@ frequency_error:
   every:
     minutes: 5
     hours: 1
+
+enabled_bad_value:
+  enabled: bad

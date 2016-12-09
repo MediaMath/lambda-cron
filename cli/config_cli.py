@@ -25,6 +25,7 @@ class ConfigCli:
     def __init__(self, environment):
         self.environment = environment
         self.bucket = DEFAULT_BUCKET_PATTERN.format(environment=self.environment)
+        self.enabled = True
         self.alarm_enabled = False
         self.alarm_email = ''
         self.hours = 1
@@ -32,6 +33,7 @@ class ConfigCli:
 
         self.config = load_config()
         self.set_bucket()
+        self.set_enabled()
         self.set_alarm()
         self.set_frequency()
 
@@ -81,3 +83,12 @@ class ConfigCli:
         if 'minutes' in config_every:
             self.minutes = config_every['minutes']
             self.hours = False
+
+    def set_enabled(self):
+        if self.config and (self.environment in self.config) and ('enabled' in self.config[self.environment]):
+            self.enabled = self.config[self.environment]['enabled']
+        elif self.config and ('all' in self.config) and ('enabled' in self.config['all']):
+            self.enabled = self.config['all']['enabled']
+
+        if not isinstance(self.enabled, bool):
+            raise Exception("Settings for 'enabled' must be a bool value")

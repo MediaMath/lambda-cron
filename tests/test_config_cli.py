@@ -19,6 +19,7 @@ def test_should_use_custom_for_environment(monkeypatch):
     assert config.alarm_email == 'my@email.com'
     assert config.minutes == 5
     assert config.hours == False
+    assert config.enabled
 
 
 def test_should_use_for_all_environment(monkeypatch):
@@ -29,6 +30,7 @@ def test_should_use_for_all_environment(monkeypatch):
     assert config.alarm_email == ''
     assert config.minutes == False
     assert config.hours == 2
+    assert config.enabled
 
 
 def test_should_use_custom_and_all_environment_2(monkeypatch):
@@ -39,6 +41,7 @@ def test_should_use_custom_and_all_environment_2(monkeypatch):
     assert config.alarm_email == ''
     assert config.minutes == False
     assert config.hours == 2
+    assert config.enabled
 
 
 def test_should_use_global_default_settings(monkeypatch):
@@ -49,6 +52,18 @@ def test_should_use_global_default_settings(monkeypatch):
     assert config.alarm_email == ''
     assert config.minutes == False
     assert config.hours == 1
+    assert config.enabled
+
+
+def test_using_custom_settings(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli.config_cli.ConfigCli('develop')
+    assert config.bucket == 'test-bucket-all-develop'
+    assert config.alarm_enabled == True
+    assert config.alarm_email == 'develop@email.com'
+    assert config.minutes == False
+    assert config.hours == 1
+    assert config.enabled == False
 
 
 def test_alarm_raise_exception_when_invalid_values_for_enabled(monkeypatch):
@@ -71,3 +86,9 @@ def test_frequency_raise_exeption_using_hours_and_minutes(monkeypatch):
         cli.config_cli.ConfigCli('frequency_error')
     assert "Only one of 'hours' or 'minutes' must be used for the frequency. Both are not allowed." in str(exception_info.value)
 
+
+def test_enabled_raise_exception_when_invalid_values(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    with pytest.raises(Exception) as exception_info:
+        cli.config_cli.ConfigCli('enabled_bad_value')
+    assert "Settings for 'enabled' must be a bool value" in str(exception_info.value)
