@@ -17,22 +17,21 @@ def check_arg(args=None):
 
     deploy_command = commands_parser.add_parser('create')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-s', '--state', default='')
     deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('deploy')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-s', '--state', default='')
     deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='DISABLED')
+    deploy_command.add_argument('-s', '--state', default='')
     deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('delete')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='DISABLED')
     deploy_command.add_argument('-a', '--aws_profile', default=None)
 
     deploy_command = commands_parser.add_parser('invoke')
@@ -156,12 +155,26 @@ class LambdaCronCLI:
     def is_deploy_needed(self):
         return (self.cli.command == 'deploy') or (self.cli.command == 'create')
 
+    def get_code_key_parameter(self, is_new_deploy=False):
+        if is_new_deploy:
+            return "ParameterKey=CodeS3Key,ParameterValue=code/{}".format(self.get_code_zip_file_name())
+        else:
+            return "ParameterKey=CodeS3Key,UsePreviousValue=true"
+
+    def get_state_value(self):
+        if self.cli.state:
+            return self.cli.state
+        if self.config.enabled:
+            return 'ENABLED'
+        else:
+            return 'DISABLED'
+
     def add_template_parameters(self, command):
         command.append("--parameters")
         command.append(self.get_code_key_parameter(self.is_deploy_needed()))
         command.append("ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket))
         command.append("ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment))
-        command.append("ParameterKey=State,ParameterValue={state}".format(state=self.cli.state)),
+        command.append("ParameterKey=State,ParameterValue={state}".format(state=self.get_state_value())),
         command.append("ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.get_cron_expression()))
         command.append("ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled))
         if self.config.alarm_enabled:
@@ -183,12 +196,6 @@ class LambdaCronCLI:
             "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(wait_create_stack_command)
-
-    def get_code_key_parameter(self, is_new_deploy=False):
-        if is_new_deploy:
-            return "ParameterKey=CodeS3Key,ParameterValue=code/{}".format(self.get_code_zip_file_name())
-        else:
-            return "ParameterKey=CodeS3Key,UsePreviousValue=true"
 
     def update_stack(self):
         update_stack_command = [

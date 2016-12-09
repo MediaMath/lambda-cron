@@ -320,7 +320,7 @@ def test_deploy_command_test_env(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'test'
-    cli_params.state = 'DISABLED'
+    cli_params.state = ''
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -335,7 +335,7 @@ def test_deploy_command_test_env(monkeypatch):
     assert 'LambdaCron-test' in lambda_cron.commands_list[2]
     assert 'ParameterKey=Bucket,ParameterValue=test-bucket-all-test' in lambda_cron.commands_list[2]
     assert 'ParameterKey=Environment,ParameterValue=test' in lambda_cron.commands_list[2]
-    assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[2]
+    assert 'ParameterKey=State,ParameterValue=ENABLED' in lambda_cron.commands_list[2]
     assert 'ParameterKey=CronExpression,ParameterValue=cron(* * * * ? *)' in lambda_cron.commands_list[2]
     assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[2]
     assert 'ParameterKey=AlarmEmail,ParameterValue=test@email.com' in lambda_cron.commands_list[2]
@@ -350,7 +350,7 @@ def test_deploy_command_develop_env(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'develop'
-    cli_params.state = 'DISABLED'
+    cli_params.state = ''
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
