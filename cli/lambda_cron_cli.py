@@ -253,6 +253,3 @@ if __name__ == '__main__':
     results = check_arg(sys.argv[1:])
     print results
     LambdaCronCLI(results).run()
-
-
-
