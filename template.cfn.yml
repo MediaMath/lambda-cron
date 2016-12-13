@@ -82,7 +82,11 @@ Resources:
             Action:
               - sqs:SendMessage
               - sqs:GetQueueUrl
-            Resource: !Sub arn:aws:sqs:us-east-1:438025690015:preakness-${Environment}
+            Resource: arn:aws:sqs:*:*:*
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource: ['*']
 
   LambdaCronHourlyEvent:
     Type: AWS::Events::Rule
