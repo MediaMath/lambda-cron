@@ -37,23 +37,16 @@ class Task:
 
 class QueueTask(Task):
 
-    def __init__(self, task):
-        Task.__init__(self, task)
-        self.queue = self.get_queue()
-
     def get_queue(self):
         queue_name = self.task['queue']
         sqs = boto3.resource('sqs')
         return sqs.get_queue_by_name(QueueName=queue_name)
 
     def run(self):
-        return self.queue.send_message(MessageBody=json.dumps(self.task['message']))
+        return self.get_queue().send_message(MessageBody=json.dumps(self.task['message']))
 
 
 class HttpTask(Task):
-
-    def __init__(self, task):
-        Task.__init__(self, task)
 
     def get_http_client(self):
         return requests
@@ -69,15 +62,11 @@ class HttpTask(Task):
 
 class InvokeLambdaTask(Task):
 
-    def __init__(self, task):
-        Task.__init__(self, task)
-        self.lambda_client = self.get_lambda_client()
-
     def get_lambda_client(self):
         return boto3.client('lambda')
 
     def run(self):
-        return self.lambda_client.invoke_async(
+        return self.get_lambda_client().invoke_async(
             FunctionName=self.task['FunctionName'],
             InvokeArgs=json.dumps(self.task['InvokeArgs'])
         )
