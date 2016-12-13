@@ -1,6 +1,7 @@
 import json
 import boto3
 import logging
+import requests
 
 
 logger = logging.getLogger()
@@ -23,6 +24,9 @@ class TaskRunner:
 
     def get_lambda_task_runner(self, task):
         return InvokeLambdaTask(task)
+
+    def get_http_task_runner(self, task):
+        return HttpTask(task)
 
 
 class Task:
@@ -48,17 +52,19 @@ class QueueTask(Task):
 
 class HttpTask(Task):
 
-    def get(self, **kwargs):
-        pass
+    def __init__(self, task):
+        Task.__init__(self, task)
 
-    def post(self, **kwargs):
-        pass
+    def get_http_client(self):
+        return requests
 
     def run(self):
         if self.task['method'].lower() == 'get':
-            self.get(self.task['url'])
+            return self.get_http_client().get(**self.task['request'])
         elif self.task['method'].lower() == 'post':
-            self.post(self.task['url'], self.task['parameters'])
+            return self.get_http_client().post(**self.task['request'])
+        else:
+            raise Exception("Http method not supported: {}".format(self.task['method'].lower()))
 
 
 class InvokeLambdaTask(Task):

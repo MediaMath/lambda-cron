@@ -1,7 +1,7 @@
 import pytest
 import json
 from mock import patch
-from lambda_cron.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask
+from lambda_cron.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask
 from lambda_cron.lib.cron_checker import CronChecker
 
 
@@ -212,16 +212,21 @@ def test_lambda_task_invoke_args_not_defined(get_lambda_client_mock, lambda_clie
 class HttpClientSpy:
     def __init__(self):
         self.args = None
-        self.get = 0
-        self.post = 0
+        self.get_count = 0
+        self.post_count = 0
 
     def get(self, **kwargs):
         self.args = kwargs
-        self.get += 1
+        self.get_count += 1
 
     def post(self, **kwargs):
         self.args = kwargs
-        self.post += 1
+        self.post_count += 1
+
+
+@pytest.fixture(scope="function")
+def http_client_spy():
+    return HttpClientSpy()
 
 
 HTTP_GET_TASK_BODY =\
@@ -237,6 +242,19 @@ HTTP_GET_TASK_BODY =\
     }
 
 
+HTTP_POST_TASK_BODY =\
+    {
+        'method': 'POST',
+        'request': {
+            'url': 'http://lambda-cron.com/tests',
+            'data': {
+                'my_data_1': 'param_value_1',
+                'my_data': 2
+            }
+        }
+    }
+
+
 @pytest.fixture(scope="function")
 def http_get_task_definition():
     return {
@@ -245,3 +263,48 @@ def http_get_task_definition():
         'type': 'http',
         'task': dict(HTTP_GET_TASK_BODY)
     }
+
+
+@pytest.fixture(scope="function")
+def http_post_task_definition():
+    return {
+        'name': 'Test task',
+        'expression': '0 11 * * *',
+        'type': 'http',
+        'task': dict(HTTP_POST_TASK_BODY)
+    }
+
+
+@patch.object(HttpTask, 'get_http_client')
+def test_http_should_run_get_basic(get_requests_client_mock, http_client_spy, cron_checker, http_get_task_definition):
+    get_requests_client_mock.return_value = http_client_spy
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(http_get_task_definition)
+
+    assert http_client_spy.get_count == 1
+    assert http_client_spy.post_count == 0
+    assert http_client_spy.args == http_get_task_definition['task']['request']
+
+
+@patch.object(HttpTask, 'get_http_client')
+def test_http_should_run_post_basic(get_requests_client_mock, http_client_spy, cron_checker, http_post_task_definition):
+    get_requests_client_mock.return_value = http_client_spy
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(http_post_task_definition)
+
+    assert http_client_spy.get_count == 0
+    assert http_client_spy.post_count == 1
+    assert http_client_spy.args == http_post_task_definition['task']['request']
+
+
+@patch.object(HttpTask, 'get_http_client')
+def test_http_not_supported_method(get_requests_client_mock, http_client_spy, cron_checker, http_get_task_definition):
+    get_requests_client_mock.return_value = http_client_spy
+    http_get_task_definition['task']['method'] = 'put'
+
+    task_runner = TaskRunner(cron_checker)
+    with pytest.raises(Exception) as exception_info:
+        task_runner.run(http_get_task_definition)
+    assert "Http method not supported: put" in str(exception_info.value)
