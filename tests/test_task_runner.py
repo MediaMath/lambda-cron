@@ -27,8 +27,8 @@ def sqs_queue_spy():
 
 QUEUE_TASK_BODY =\
     {
-        'queue': 'test-queue',
-        'message': {
+        'QueueName': 'test-queue',
+        'MessageBody': {
             'message_key_1': 'message_value_1',
             'message_key_2': ['message_value_2']
         }
@@ -91,7 +91,7 @@ def test_queue_should_run_basic(get_queue_mock, sqs_queue_spy, cron_checker, que
     task_runner.run(queue_task_definition)
 
     assert sqs_queue_spy.messages_sent == 1
-    assert sqs_queue_spy.message_body == json.dumps(QUEUE_TASK_BODY['message'])
+    assert sqs_queue_spy.message_body == json.dumps(QUEUE_TASK_BODY['MessageBody'])
 
 
 @patch.object(QueueTask, 'get_queue')
@@ -109,21 +109,21 @@ def test_queue_should_not_by_time_run_basic(get_queue_mock, sqs_queue_spy, cron_
 @patch.object(QueueTask, 'get_queue')
 def test_queue_task_message_not_defined(get_queue_mock, sqs_queue_spy, cron_checker, queue_task_definition):
     get_queue_mock.return_value = sqs_queue_spy
-    queue_task_definition['task'].pop('message', None)
+    queue_task_definition['task'].pop('MessageBody', None)
 
     task_runner = TaskRunner(cron_checker)
     with pytest.raises(KeyError) as exception_info:
         task_runner.run(queue_task_definition)
-    assert exception_info.match(r'message')
+    assert exception_info.match(r'MessageBody')
 
 
 def test_queue_task_queue_not_defined(cron_checker, queue_task_definition):
-    queue_task_definition['task'].pop('queue', None)
+    queue_task_definition['task'].pop('QueueName', None)
 
     task_runner = TaskRunner(cron_checker)
     with pytest.raises(KeyError) as exception_info:
         task_runner.run(queue_task_definition)
-    assert exception_info.match(r'queue')
+    assert exception_info.match(r'QueueName')
 
 
 class LambdaClientSpy:

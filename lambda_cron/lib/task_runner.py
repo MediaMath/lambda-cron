@@ -38,12 +38,12 @@ class Task:
 class QueueTask(Task):
 
     def get_queue(self):
-        queue_name = self.task['queue']
+        queue_name = self.task['QueueName']
         sqs = boto3.resource('sqs')
         return sqs.get_queue_by_name(QueueName=queue_name)
 
     def run(self):
-        return self.get_queue().send_message(MessageBody=json.dumps(self.task['message']))
+        return self.get_queue().send_message(MessageBody=json.dumps(self.task['MessageBody']))
 
 
 class HttpTask(Task):
