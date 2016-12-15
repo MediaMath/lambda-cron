@@ -16,7 +16,7 @@ class TaskRunner:
         if self.cron_checker.should_run(task['expression']):
             command_method = getattr(self, "get_{}_task_runner".format(task['type'].lower()))
             response = command_method(task['task']).run()
-            logger.info('Task executed')
+            logger.info('Task executed!')
             logger.info(response)
 
     def get_queue_task_runner(self, task):

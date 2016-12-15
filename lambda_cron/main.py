@@ -41,8 +41,8 @@ def handler(event, _):
             continue
         try:
             task_definition = yaml.load(obj.get()['Body'].read())
-            if task_runner.run(task_definition):
-                logger.info("** Task fired: {}".format(task_definition['name']))
+            logger.info("Running task: {}".format(task_definition['name']))
+            task_runner.run(task_definition)
         except Exception, exc:
             logger.error("!! Error processing task: {}".format(obj.key))
             traceback.print_exc()
