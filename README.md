@@ -164,7 +164,7 @@ Create new **LambdaCron** environment in the AWS account.
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
-* **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
+* **--enabled (-n)**: Enabled or disabled lambda cron (True | False) (optional)
 * **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
 
 #### update
@@ -174,7 +174,7 @@ Update new settings for the environment.
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
-* **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
+* **--enabled (-n)**: Enabled or disabled lambda cron (True | False) (optional)
 * **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
 
 #### invoke
@@ -196,6 +196,8 @@ Parameters:
 * **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
 
 
+**Important!*: if parameter **--enabled (-n)** is specified it will overwrite 
+setting value for **enabled**.
 
 
 
@@ -250,6 +252,7 @@ CloudFormation tools.
 enable/disable tasks
 manage logs
 index file
+show sumary
     
     
 #### Frequency
