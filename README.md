@@ -165,7 +165,7 @@ Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
 * **--enabled (-n)**: Enabled or disabled lambda cron (True | False) (optional)
-* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 #### update
 
@@ -175,7 +175,7 @@ Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
 * **--enabled (-n)**: Enabled or disabled lambda cron (True | False) (optional)
-* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 #### invoke
 
@@ -184,7 +184,7 @@ Invoke lambda function cron manually
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
-* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 #### delete
 
@@ -193,7 +193,7 @@ Delete **LambdaCron** environment from the AWS account
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
-* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 
 **Important!*: if parameter **--enabled (-n)** is specified it will overwrite 
