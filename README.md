@@ -9,9 +9,9 @@ linux [crontab](https://help.ubuntu.com/community/CronHowto).
 
 **LambdaCron** offer 3 different type of task to run:
 
-* Queue task: send message to AWS SQS queue.
-* Invoke Lambda task: invoke AWS lambda function.
-* HTTP task: send HTTP requests (GET & POST).
+* **Queue task**: send message to AWS SQS queue.
+* **Lambda task**: invoke AWS lambda function.
+* **HTTP task**: send HTTP requests (GET & POST).
 
 Tasks are defined in YAML files and are stored on a S3 bucket.
 
@@ -200,64 +200,126 @@ Parameters:
 setting value for **enabled**.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## Tasks
 
+Tasks are defined in YAML files, every task in an independent file. The keys that
+mast contains every task are:
+
+* **name**: task name
+* **expression**: crontab expression
+* **type**: task type (queue | lambda | http)
+* **task**: task definition (customized for each type of tasks)
+
+### Queue task
+
+It sends a message to a AWS SQS queue.
+The task definition must contains following keys:
+
+* **QueueName**: Name of the queue (string)
+* **MessageBody**: Message to be sent (YAML/JSON)
+
 ``` yaml
-name: sample name
-expression: "0 2 * * *"
+name: 'Send performance report every morning'
+expression: '0 9 * * *'
+type: 'queue'
 task:
-  key1: value 1
-  key2: value 2
+  QueueName: 'my-scheduler-queue'
+  MessageBody:
+    name: 'Performance report'
+    type: 'report'
+    sql: 'SELECT ....'
+    recipients:
+      emails: ....
 ```
 
-## Development
+Message is sent using [boto3 SQS.Queue.send_message](http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.send_message)
+All parameters of the function will be supported soon.
 
-#### CloudFormation
-Project is running 100% with AWS resources and they are defined using CloudFormation.
-The the template defined a stack will be created in AWS and it will be managed using
-CloudFormation tools.
+### Lambda task
 
-### Requirements
-- Python 2.7
-- Virtual Environment
-- pip
-- Boto3
-  - Boto3 is installed as part of the lambda functions Environment.  To aviod the overhead of including it in your deployment artifact install boto3 on your system instead of in the virtual environment
-- awscli (configured)
+It invokes and AWS lambda functions.
+The task definition must contains following keys
+
+* **FunctionName**: Name of the lambda function to invoke (string)
+* **InvokeArgs**: arguments to send (YAML/JSON)
+
+``` yaml
+name: 'Run ETL process every hour'
+expression: '0 * * * *'
+type: 'lambda'
+task:
+  FunctionName: 'run-etl-process-prod'
+  InvokeArgs:
+    source: 's3://my-data-source/performance'
+    output: 's3://my-data-output/performance'
+```
+
+Function is invoked using [boto3 Lambda.Client.invoke_async](http://boto3.readthedocs.io/en/latest/reference/services/lambda.html#Lambda.Client.invoke_async)
+
+### HTTP task
+
+It send and HTTP request (GET or POST).
+The task definition must contains following keys:
+
+* **method**: http method (get | post)
+* **request**: YAML with parameters to send for the selected method using [Requests](http://docs.python-requests.org/en/master/)
+
+``` yaml
+name: 'helth check every hour'
+expression: '0 * * * *'
+type: 'http'
+task:
+  method: 'get'
+  request:
+    url: 'http://helthcheck.my-domain.com'
+    params:
+      service: 'lambda'
+```
+
+It is a wrapper over [Requests](http://docs.python-requests.org/en/master/).
+All http methods will be supported soon.
+
+
+## Requirements
+
+* Python 2.7
+* pip
+* AWS account
+* awscli (configured)
+
+**LambdaCron** is based 100% on AWS cloud.
+
+## Frequency
+
+When setting up the frequency of **LambdaCron** you must have into account followingthings.
+
+####  Higher frequency is 1 minute
+
+Events are based on [AWS CloudWatch Events](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html).
+You can read in following [documentation](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html):
+
+* "The finest resolution using a Cron expression is a minute"
+* "Your scheduled rule is triggered within that minute, but not on the precise 0th second"
+
+Be aware of this.
+
+####  Higher frequency for a task is LambdaCron frequency.
+
+It means that if LambdaCron run every hour and the task expression is set for every 15 min. the task
+will run once an hour.
+
+When LambdaCron runs it will executed all tasks scheduled for the period of time until next execution. 
+For example, if LambdaCron runs every hour (at min. 0) and the is a task scheduled for minute 30 it will
+run at minute 0, LambdaCron will run again next hour.
 
 ## TODO
 
-* Cron:
-    * Task to invoke Lambda functions
-    * Task to send HTTP requests
-    * Allow customized frequency
-    * Template system for task definitions.
-* CLI
-    * Allow customized frequency
-    * Allow to use different AWS profiles.
-    * Improve output
-    
-enable/disable tasks
-manage logs
-index file
-show sumary
-    
-    
-#### Frequency
- - cada minuto, aws no garantiza el segundo 0.
- - La mayor frequencia de ejcucion es la frequencia con la que se ejecuta la lambda function.
- 
-#### How it works
-Cloudformation stack
+Features/Improvements that would like to implement some time soon.
+
+* Be able to disable tasks
+* Index file to know which tasks must runs and avoid read all of them
+* Support all parameters for [boto3 SQS.Queue.send_message](http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.send_message)
+* Improve CLI output.
+* Add new commands:
+  * Upload tasks to S3
+  * Manage/show logs
