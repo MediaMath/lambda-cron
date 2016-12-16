@@ -38,9 +38,9 @@ values.
 Settings are saved in a YAML file. Each environment is defined with a root key the YAML
 as the global settings with the key *global*.
 
-#### Options
+Following are the available options:
 
-##### bucket
+#### bucket
 
 Name of the bucket where lambda function code will be hosted and tasks stored.
 
@@ -58,7 +58,7 @@ The bucket will have to folders:
 * code/
 * tasks/
 
-##### every (frequency)
+#### every (frequency)
 
 Frequency with which the lambda function that evaluate tasks will run.
 It indicates the frequency by **minutes OR hours** with an integer number.
@@ -76,7 +76,7 @@ every:
 
 More info for [frequency](#frequency)
 
-##### alarm
+#### alarm
 
 Alarm can be set up using CloudWatch metrics. It use the following parameters:
 
@@ -91,7 +91,7 @@ alarm:
 
 **Defualt**: not enabled.
 
-##### enabled
+#### enabled
 
 It allows to enabled/disabled the cron.
 
