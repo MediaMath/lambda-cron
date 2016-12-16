@@ -312,6 +312,24 @@ When LambdaCron runs it will executed all tasks scheduled for the period of time
 For example, if LambdaCron runs every hour (at min. 0) and the is a task scheduled for minute 30 it will
 run at minute 0, LambdaCron will run again next hour.
 
+## Getting Started
+
+Clone this repo
+
+``` bash
+$ git clone https://github.com/mediamath/lambda-cron.git
+```
+
+To create your first environment (called 'test') with default settings:
+
+``` bash
+$ bin/lambda-cron create --environment=test
+```
+
+If you want to set some custom settings create the setting file:
+
+* config/cli.yml
+
 ## TODO
 
 Features/Improvements that would like to implement some time soon.
@@ -319,7 +337,11 @@ Features/Improvements that would like to implement some time soon.
 * Be able to disable tasks
 * Index file to know which tasks must runs and avoid read all of them
 * Support all parameters for [boto3 SQS.Queue.send_message](http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.send_message)
+* Support all HTTP methods in [Requests](http://docs.python-requests.org/en/master/)
 * Improve CLI output.
 * Add new commands:
   * Upload tasks to S3
   * Manage/show logs
+* Create LambdaCron package to be installed with pip
+  * File with settings in ~/.lambda-cron
+  * Setting files can include other setting files.
