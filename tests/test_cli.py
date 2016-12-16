@@ -32,7 +32,7 @@ def test_create_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -62,7 +62,7 @@ def test_add_profile_to_create_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -82,7 +82,7 @@ def test_deploy_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -112,7 +112,7 @@ def test_add_profile_to_deploy_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -132,7 +132,7 @@ def test_update_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'prod'
-    cli_params.state = 'ENABLED'
+    cli_params.enabled = 'True'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -159,7 +159,7 @@ def test_add_profile_to_update_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'prod'
-    cli_params.state = 'ENABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -177,7 +177,7 @@ def test_delete_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -196,7 +196,7 @@ def test_add_profile_to_delete_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -214,7 +214,7 @@ def test_invoke_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'invoke'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -232,7 +232,7 @@ def test_add_profile_to_invoke_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -248,7 +248,7 @@ def test_lambda_function_config(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -269,7 +269,7 @@ def test_lambda_function_config_II(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'other'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -290,7 +290,7 @@ def test_deploy_command_other_env(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'other'
-    cli_params.state = 'DISABLED'
+    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -320,7 +320,7 @@ def test_deploy_command_test_env(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'test'
-    cli_params.state = ''
+    cli_params.enabled = ''
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -350,7 +350,7 @@ def test_deploy_command_develop_env(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'deploy'
     cli_params.environment = 'develop'
-    cli_params.state = ''
+    cli_params.enabled = ''
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)

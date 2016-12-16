@@ -17,17 +17,17 @@ def check_arg(args=None):
 
     deploy_command = commands_parser.add_parser('create')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='')
+    deploy_command.add_argument('-n', '--enabled', default='')
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('deploy')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='')
+    deploy_command.add_argument('-n', '--enabled', default='')
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-s', '--state', default='')
+    deploy_command.add_argument('-n', '--enabled', default='')
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('delete')
@@ -162,9 +162,12 @@ class LambdaCronCLI:
             return "ParameterKey=CodeS3Key,UsePreviousValue=true"
 
     def get_state_value(self):
-        if self.cli.state:
-            return self.cli.state
-        if self.config.enabled:
+        if self.cli.enabled == 'False' or self.cli.enabled == 'True':
+            enabled = self.cli.enabled == 'True'
+        else:
+            enabled = self.config.enabled
+
+        if enabled:
             return 'ENABLED'
         else:
             return 'DISABLED'
