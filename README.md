@@ -149,25 +149,66 @@ The settings for each environment will be:
     * enabled: False
     * email: ''
   
-
-
-
-
-
-
-
 ### Commands
 
-* **create**: Create new **LambdaCron** environment in the AWS account
-  * **--environment (-e)**: Environment to work with (string)
-  * **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
-* **update**: Update new settings for the environment.
-  * **--environment (-e)**: Environment to work with (string)
-  * **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
-* **invoke**: Invoke lambda function manually
-  * **--environment (-e)**: Environment to work with (string)
-* **delete**: Delete **LambdaCron** environment from the AWS account
-  * **--environment (-e)**: Environment to work with (string)
+**LambdaCron** CLI use [aws-cli](https://github.com/aws/aws-cli), every command
+is translated into aws-cli command. AWS account should be configured for aws-cli. 
+LambdaCron CLI allow to specify different aws-cli profiles.
+
+Following is the list of commands available.
+
+#### create
+
+Create new **LambdaCron** environment in the AWS account.
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
+* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+
+#### update
+
+Update new settings for the environment.
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--state (-s)**: State of the lambda event (ENABLED | DISABLED) (optional)
+* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+
+#### invoke
+
+Invoke lambda function cron manually
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+
+#### delete
+
+Delete **LambdaCron** environment from the AWS account
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--aws-profile (-)**: AWS profile to use from aws-cli (string) (optional)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Tasks
 
@@ -204,9 +245,16 @@ CloudFormation tools.
 * CLI
     * Allow customized frequency
     * Allow to use different AWS profiles.
+    * Improve output
     
+enable/disable tasks
+manage logs
+index file
     
     
 #### Frequency
  - cada minuto, aws no garantiza el segundo 0.
  - La mayor frequencia de ejcucion es la frequencia con la que se ejecuta la lambda function.
+ 
+#### How it works
+Cloudformation stack
