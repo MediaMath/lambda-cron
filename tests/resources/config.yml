@@ -39,10 +39,14 @@ alarm_enabled_no_email:
   alarm:
     enabled: True
 
-frequency_error:
+enabled_bad_value:
+  enabled: bad
+
+frequency_error_only_one:
   every:
     minutes: 5
     hours: 1
 
-enabled_bad_value:
-  enabled: bad
+frequency_float:
+  every:
+    minutes: 5.2

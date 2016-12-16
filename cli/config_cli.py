@@ -75,13 +75,13 @@ class ConfigCli:
             return
 
         if ('hours' in config_every) and ('minutes' in config_every):
-            raise Exception("Only one of 'hours' or 'minutes' must be used for the frequency. Both are not allowed.")
+            raise Exception("Only one of 'hours' or 'minutes' must be used for the frequency ('every'). Both are not allowed.")
 
         if 'hours' in config_every:
-            self.hours = config_every['hours']
+            self.hours = int(config_every['hours'])
             self.minutes = False
         if 'minutes' in config_every:
-            self.minutes = config_every['minutes']
+            self.minutes = int(config_every['minutes'])
             self.hours = False
 
     def set_enabled(self):

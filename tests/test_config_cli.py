@@ -80,15 +80,21 @@ def test_alarm_raise_exception_when_alarm_enabled_and_no_email(monkeypatch):
     assert "Email must be provided when alarm is enabled" in str(exception_info.value)
 
 
-def test_frequency_raise_exeption_using_hours_and_minutes(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    with pytest.raises(Exception) as exception_info:
-        cli.config_cli.ConfigCli('frequency_error')
-    assert "Only one of 'hours' or 'minutes' must be used for the frequency. Both are not allowed." in str(exception_info.value)
-
-
 def test_enabled_raise_exception_when_invalid_values(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     with pytest.raises(Exception) as exception_info:
         cli.config_cli.ConfigCli('enabled_bad_value')
     assert "Settings for 'enabled' must be a bool value" in str(exception_info.value)
+
+
+def test_frequency_raise_exeption_using_hours_and_minutes(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    with pytest.raises(Exception) as exception_info:
+        cli.config_cli.ConfigCli('frequency_error_only_one')
+    assert "Only one of 'hours' or 'minutes' must be used for the frequency ('every'). Both are not allowed." in str(exception_info.value)
+
+
+def test_frequency_raise_with_float_value(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli.config_cli.ConfigCli('frequency_float')
+    assert config.minutes == 5
