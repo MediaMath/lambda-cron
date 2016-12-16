@@ -1,34 +1,162 @@
 [![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
 # LambdaCron
 
-Project to run scheduled tasks using lambda functions on AWS.
+**LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
+on AWS cloud and all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
 
-Lambda function will run periodically (can be customized) and it will run
-the tasks scheduled for current period.
+Tasks are scheduled using the same syntax for expressions as well known
+linux [crontab](https://help.ubuntu.com/community/CronHowto).
 
-**LambdaCron** provide different type of actions to trigger with the tasks:
+**LambdaCron** offer 3 different type of task to run:
 
-* Send message to SQS queue.
-* Invoke lambda function.
-* HTTP requests (GET & POST)
+* Queue task: send message to AWS SQS queue.
+* Invoke Lambda task: invoke AWS lambda function.
+* HTTP task: send HTTP requests (GET & POST).
 
-Tasks are YAML files stored on a S3 bucket and they will define frequency
-of the task (cron expression) and the action to do.
+Tasks are defined in YAML files and are stored on a S3 bucket.
 
 ## LambdaCron CLI
 
-**LambdaCron** provide a CLI tool that allow to run multiple environments
-with different settings.
+**LambdaCron** provide a CLI tool that allow to manage you cron tasks from you localhost,
+without needing to access to AWS console.
 
-Some of the setting that are allowed to set are:
-
-* Bucket to store tasks and lambda function code.
-* Frequency
-
-This settings can be customized for each environment. As many environments
+Also it allows to run multiple environments with different settings. As many environments
 as desired can be set up.
 
-### CLI commands
+### Settings
+
+There are 3 levels of preferences for settings:
+
+* Environment: Custom values for an specific environment.
+* Global: Custom values that will have effect to all environments created.
+* Default: Default value for options in case no custom values are specified (by environment or globally)
+
+First level of preference is *Environment*, followed by *Global* and finally *Default*. When creating
+and environment some settings can be customized by environment, others globally and others with default
+values.
+
+Settings are saved in a YAML file. Each environment is defined with a root key the YAML
+as the global settings with the key *global*.
+
+#### Options
+
+##### bucket
+
+Name of the bucket where lambda function code will be hosted and tasks stored.
+
+```yaml
+bucket: 'my-custom-bucket-name'
+```
+
+You can use the pattern **{environment}** in the string for the bucket, it will
+be replaced by the environment name.
+
+**Defualt**: lambda-cron-{environment}
+
+The bucket will have to folders:
+
+* code/
+* tasks/
+
+##### every (frequency)
+
+Frequency with which the lambda function that evaluate tasks will run.
+It indicates the frequency by **minutes OR hours** with an integer number.
+It is specified with one of the following parameters:
+
+* minutes
+* hours
+
+```yaml
+every:
+    minutes: 5
+```
+
+**Defualt**: every hour.
+
+More info for [frequency](#frequency)
+
+##### alarm
+
+Alarm can be set up using CloudWatch metrics. It use the following parameters:
+
+* enabled
+* email (Required if alarm is enabled).
+
+```yaml
+alarm:
+    enabled: True
+    email: my-mailing-list@email.com
+```
+
+**Defualt**: not enabled.
+
+##### enabled
+
+It allows to enabled/disabled the cron.
+
+```yaml
+enabled: True
+```
+
+**Defualt**: enabled.
+
+#### Example
+
+```yaml
+global:
+  bucket: 'my-project-cron-{environment}'
+
+prod:
+  alarm:
+    enabled: True
+    email: dev-alerts@domain.com
+  every:
+    minutes: 5
+
+staging:
+  every:
+    minutes: 5
+
+dev:
+  enabled: False
+```
+
+The settings for each environment will be:
+
+* prod:
+  * enabled: True
+  * bucket: my-project-cron-prod
+  * alarm:
+    * enabled: True
+    * email: dev-alerts@domain.com
+  * every:
+    * minutes: 5
+
+* staging:
+  * enabled: True
+  * bucket: my-project-cron-staging
+  * alarm:
+    * enabled: False
+    * email: ''
+  * every:
+    * minutes: 5
+
+* staging:
+  * enabled: False
+  * bucket: my-project-cron-dev
+  * alarm:
+    * enabled: False
+    * email: ''
+  
+
+
+
+
+
+
+
+### Commands
 
 * **create**: Create new **LambdaCron** environment in the AWS account
   * **--environment (-e)**: Environment to work with (string)
@@ -77,3 +205,8 @@ CloudFormation tools.
     * Allow customized frequency
     * Allow to use different AWS profiles.
     
+    
+    
+#### Frequency
+ - cada minuto, aws no garantiza el segundo 0.
+ - La mayor frequencia de ejcucion es la frequencia con la que se ejecuta la lambda function.
