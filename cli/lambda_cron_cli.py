@@ -18,25 +18,25 @@ def check_arg(args=None):
     deploy_command = commands_parser.add_parser('create')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='')
-    deploy_command.add_argument('-a', '--aws_profile', default=None)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('deploy')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='')
-    deploy_command.add_argument('-a', '--aws_profile', default=None)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-s', '--state', default='')
-    deploy_command.add_argument('-a', '--aws_profile', default=None)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('delete')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-a', '--aws_profile', default=None)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('invoke')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-a', '--aws_profile', default=None)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     return parser.parse_args(args)
 
