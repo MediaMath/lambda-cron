@@ -20,6 +20,7 @@ def check_arg(args=None):
     deploy_command = commands_parser.add_parser('create')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
+    deploy_command.add_argument('--create-bucket', action='store_true', dest='create_bucket')
 
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
@@ -95,13 +96,13 @@ class LambdaCronCLI:
         self.exec_command(pip_install_command)
 
     def exec_command(self, command):
-        subprocess.call(command)
+        return subprocess.call(command)
 
     def exec_aws_command(self, command):
         if self.cli.aws_profile:
             command.append('--profile')
             command.append(self.cli.aws_profile)
-        self.exec_command(command)
+        return self.exec_command(command)
 
     def generate_config(self):
         lambda_function_config = {
@@ -224,7 +225,25 @@ class LambdaCronCLI:
         ]
         self.exec_aws_command(wait_update_stack_command)
 
+    def check_bucket(self):
+        check_bucket_command = ["aws", "s3api", "head-bucket", "--bucket", self.config.bucket]
+        command_result = self.exec_aws_command(check_bucket_command)
+
+        if self.cli.create_bucket:
+            if command_result == 0:
+                print "Bucket '{}' already exists".format(self.config.bucket)
+                exit(1)
+            else:
+                print "Creating bucket '{}'".format(self.config.bucket)
+                create_bucket_command = ["aws", "s3api", "create-bucket", "--bucket", self.config.bucket]
+                self.exec_aws_command(create_bucket_command)
+        else:
+            if not command_result == 0:
+                print "Bucket '{}' does not exist".format(self.config.bucket)
+                exit(1)
+
     def create(self):
+        self.check_bucket()
         self.zip_code()
         self.upload_code_to_s3()
         self.create_stack()
