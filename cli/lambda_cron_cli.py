@@ -103,14 +103,12 @@ class LambdaCronCLI:
         self.exec_command(command)
 
     def generate_config(self):
-        frequency_config = {}
-        if self.config.minutes:
-            frequency_config['minutes'] = self.config.minutes
-        elif self.config.hours:
-            frequency_config['hours'] = self.config.hours
         lambda_function_config = {
             'bucket': self.config.bucket,
-            'frequency': frequency_config
+            'frequency': {
+                'hours': self.config.hours,
+                'minutes': self.config.minutes
+            }
         }
         self.write_lambda_functions_config(lambda_function_config)
 

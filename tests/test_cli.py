@@ -257,7 +257,8 @@ def test_lambda_function_config(monkeypatch):
     expected_config = {
         'bucket': 'test-bucket-custom',
         'frequency': {
-            'minutes': 5
+            'minutes': 5,
+            'hours': 0
         }
     }
 
@@ -278,7 +279,8 @@ def test_lambda_function_config_II(monkeypatch):
     expected_config = {
         'bucket': 'test-bucket-all-other',
         'frequency': {
-            'hours': 2
+            'hours': 2,
+            'minutes': 0
         }
     }
 

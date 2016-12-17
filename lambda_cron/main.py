@@ -24,16 +24,18 @@ def read_config():
         return yaml.load(config_file)
 
 
+CONFIG = read_config()
+
+
 def handler(event, _):
     """ Main function """
     logger.info(event)
 
-    config = read_config()
-    logger.info(config)
+    logger.info(CONFIG)
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket(config['bucket'])
+    bucket = s3.Bucket(CONFIG['bucket'])
 
-    cron_checker = CronChecker(event['time'], hour_period=1, minutes_period=0)
+    cron_checker = CronChecker(event['time'], hour_period=CONFIG['hours'], minutes_period=CONFIG['minutes'])
     task_runner = TaskRunner(cron_checker)
 
     for obj in bucket.objects.filter(Prefix=TASKS_PREFIX):
