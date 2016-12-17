@@ -155,11 +155,20 @@ class LambdaCronCLI:
     def is_deploy_needed(self):
         return (self.cli.command == 'deploy') or (self.cli.command == 'create')
 
-    def get_code_key_parameter(self, is_new_deploy=False):
-        if is_new_deploy:
-            return "ParameterKey=CodeS3Key,ParameterValue=code/{}".format(self.get_code_zip_file_name())
+    def is_active_stop_command(self):
+        return (self.cli.command == 'active') or (self.cli.command == 'stop')
+
+    def get_code_key_parameter(self):
+        if self.is_deploy_needed():
+            return "ParameterValue=code/{}".format(self.get_code_zip_file_name())
         else:
-            return "ParameterKey=CodeS3Key,UsePreviousValue=true"
+            return "UsePreviousValue=true"
+
+    def get_parameter_value(self, value):
+        if self.is_active_stop_command():
+            return "UsePreviousValue=true"
+        else:
+            return "ParameterValue={}".format(value)
 
     def get_state_value(self):
         if self.cli.enabled == 'False' or self.cli.enabled == 'True':
@@ -174,15 +183,15 @@ class LambdaCronCLI:
 
     def add_template_parameters(self, command):
         command.append("--parameters")
-        command.append(self.get_code_key_parameter(self.is_deploy_needed()))
-        command.append("ParameterKey=Bucket,ParameterValue={bucket}".format(bucket=self.config.bucket))
         command.append("ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment))
         command.append("ParameterKey=State,ParameterValue={state}".format(state=self.get_state_value())),
-        command.append("ParameterKey=CronExpression,ParameterValue={cron_expr}".format(cron_expr=self.get_cron_expression()))
-        command.append("ParameterKey=AlarmEnabled,ParameterValue={alarm_enabled}".format(alarm_enabled=self.config.alarm_enabled))
+        command.append("ParameterKey=CodeS3Key,{}".format(self.get_code_key_parameter()))
+        command.append("ParameterKey=Bucket,{}".format(self.get_parameter_value(self.config.bucket)))
+        command.append("ParameterKey=CronExpression,{}".format(self.get_parameter_value(self.get_cron_expression())))
+        command.append("ParameterKey=AlarmEnabled,{}".format(self.get_parameter_value(self.config.alarm_enabled)))
         if self.config.alarm_enabled:
-            command.append("ParameterKey=AlarmEmail,ParameterValue={alarm_email}".format(alarm_email=self.config.alarm_email))
-            command.append("ParameterKey=AlarmPeriod,ParameterValue={alarm_period}".format(alarm_period=self.get_alarm_period()))
+            command.append("ParameterKey=AlarmEmail,{}".format(self.get_parameter_value(self.config.alarm_email)))
+            command.append("ParameterKey=AlarmPeriod,{}".format(self.get_parameter_value(self.get_alarm_period())))
         return command
 
     def create_stack(self):
