@@ -234,9 +234,6 @@ class LambdaCronCLI:
         self.upload_code_to_s3()
         self.update_stack()
 
-    # def update(self):
-    #     self.update_stack()
-
     def start(self):
         self.update_stack()
 
