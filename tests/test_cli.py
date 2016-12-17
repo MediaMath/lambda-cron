@@ -408,3 +408,74 @@ def test_add_profile_to_stop_commands(monkeypatch):
     assert 'my-profile' in lambda_cron.commands_list[0]
     assert '--profile' in lambda_cron.commands_list[1]
     assert 'my-profile' in lambda_cron.commands_list[1]
+
+
+@patch.object(LambdaCronCLISpy, 'bucket_exists')
+def test_check_bucket_need_create_bucket(bucket_exists_mock, monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    bucket_exists_mock.return_value = False
+    cli_params = Namespace()
+    cli_params.command = 'create'
+    cli_params.environment = 'prod'
+    cli_params.create_bucket = True
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.check_bucket()
+
+    assert len(lambda_cron.commands_list) == 1
+    assert "aws" in lambda_cron.commands_list[0]
+    assert "s3api" in lambda_cron.commands_list[0]
+    assert "create-bucket" in lambda_cron.commands_list[0]
+    assert "--bucket" in lambda_cron.commands_list[0]
+    assert "test-bucket-custom" in lambda_cron.commands_list[0]
+
+
+@patch.object(LambdaCronCLISpy, 'bucket_exists')
+def test_check_bucket_bucket_already_exists_error(bucket_exists_mock, monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    bucket_exists_mock.return_value = True
+    cli_params = Namespace()
+    cli_params.command = 'create'
+    cli_params.environment = 'prod'
+    cli_params.create_bucket = True
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    with pytest.raises(SystemExit) as system_exit:
+        lambda_cron.check_bucket()
+
+    assert system_exit.value.code == 1
+
+
+@patch.object(LambdaCronCLISpy, 'bucket_exists')
+def test_check_bucket_bucket_already_exists_ok(bucket_exists_mock, monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    bucket_exists_mock.return_value = True
+    cli_params = Namespace()
+    cli_params.command = 'create'
+    cli_params.environment = 'prod'
+    cli_params.create_bucket = False
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.check_bucket()
+
+    assert len(lambda_cron.commands_list) == 0
+
+
+@patch.object(LambdaCronCLISpy, 'bucket_exists')
+def test_check_bucket_bucket_does_not_exist_error(bucket_exists_mock, monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    bucket_exists_mock.return_value = False
+    cli_params = Namespace()
+    cli_params.command = 'create'
+    cli_params.environment = 'prod'
+    cli_params.create_bucket = False
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    with pytest.raises(SystemExit) as system_exit:
+        lambda_cron.check_bucket()
+
+    assert system_exit.value.code == 2

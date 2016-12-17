@@ -225,12 +225,15 @@ class LambdaCronCLI:
         ]
         self.exec_aws_command(wait_update_stack_command)
 
-    def check_bucket(self):
+    def bucket_exists(self):
         check_bucket_command = ["aws", "s3api", "head-bucket", "--bucket", self.config.bucket]
         command_result = self.exec_aws_command(check_bucket_command)
+        return command_result == 0
 
+    def check_bucket(self):
+        bucket_exists = self.bucket_exists()
         if self.cli.create_bucket:
-            if command_result == 0:
+            if bucket_exists:
                 print "Bucket '{}' already exists".format(self.config.bucket)
                 exit(1)
             else:
@@ -238,9 +241,9 @@ class LambdaCronCLI:
                 create_bucket_command = ["aws", "s3api", "create-bucket", "--bucket", self.config.bucket]
                 self.exec_aws_command(create_bucket_command)
         else:
-            if not command_result == 0:
+            if not bucket_exists:
                 print "Bucket '{}' does not exist".format(self.config.bucket)
-                exit(1)
+                exit(2)
 
     def create(self):
         self.check_bucket()
