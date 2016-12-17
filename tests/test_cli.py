@@ -154,7 +154,6 @@ def test_add_profile_to_update_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'prod'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -172,7 +171,6 @@ def test_delete_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -191,7 +189,6 @@ def test_add_profile_to_delete_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -209,7 +206,6 @@ def test_invoke_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'invoke'
     cli_params.environment = 'prod'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -227,7 +223,6 @@ def test_add_profile_to_invoke_commands(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -243,7 +238,6 @@ def test_lambda_function_config(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -265,7 +259,6 @@ def test_lambda_function_config_II(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'other'
-    cli_params.enabled = 'False'
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -367,3 +360,46 @@ def test_deploy_command_develop_env(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[2]
     assert 'stack-update-complete' in lambda_cron.commands_list[3]
     assert '--profile' not in lambda_cron.commands_list[3]
+
+
+def test_start_command(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'start'
+    cli_params.environment = 'prod'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 2
+    assert 'update-stack' in lambda_cron.commands_list[0]
+    assert 'LambdaCron-prod' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=CodeS3Key,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=Bucket,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=State,ParameterValue=ENABLED' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=CronExpression,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmEnabled,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmEmail,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmPeriod,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert '--profile' not in lambda_cron.commands_list[0]
+    assert 'stack-update-complete' in lambda_cron.commands_list[1]
+    assert '--profile' not in lambda_cron.commands_list[1]
+
+
+def test_add_profile_to_start_commands(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'start'
+    cli_params.environment = 'prod'
+    cli_params.aws_profile = 'my-profile'
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 2
+    assert '--profile' in lambda_cron.commands_list[0]
+    assert 'my-profile' in lambda_cron.commands_list[0]
+    assert '--profile' in lambda_cron.commands_list[1]
+    assert 'my-profile' in lambda_cron.commands_list[1]

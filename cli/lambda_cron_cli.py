@@ -29,6 +29,10 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
+    deploy_command = commands_parser.add_parser('start')
+    deploy_command.add_argument('-e', '--environment', required=True)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
+
     deploy_command = commands_parser.add_parser('delete')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
@@ -152,8 +156,8 @@ class LambdaCronCLI:
     def is_deploy_needed(self):
         return (self.cli.command == 'deploy') or (self.cli.command == 'create')
 
-    def is_active_stop_command(self):
-        return (self.cli.command == 'active') or (self.cli.command == 'stop')
+    def is_start_stop_command(self):
+        return (self.cli.command == 'start') or (self.cli.command == 'stop')
 
     def get_code_key_parameter(self):
         if self.is_deploy_needed():
@@ -162,12 +166,17 @@ class LambdaCronCLI:
             return "UsePreviousValue=true"
 
     def get_parameter_value(self, value):
-        if self.is_active_stop_command():
+        if self.is_start_stop_command():
             return "UsePreviousValue=true"
         else:
             return "ParameterValue={}".format(value)
 
     def get_state_value(self):
+        if self.cli.command == 'start':
+            return 'ENABLED'
+        if self.cli.command == 'stop':
+            return 'DISABLED'
+
         if self.config.enabled:
             return 'ENABLED'
         else:
@@ -176,7 +185,7 @@ class LambdaCronCLI:
     def add_template_parameters(self, command):
         command.append("--parameters")
         command.append("ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment))
-        command.append("ParameterKey=State,{}".format(self.get_parameter_value(self.get_state_value()))),
+        command.append("ParameterKey=State,ParameterValue={state}".format(state=self.get_state_value())),
         command.append("ParameterKey=CodeS3Key,{}".format(self.get_code_key_parameter()))
         command.append("ParameterKey=Bucket,{}".format(self.get_parameter_value(self.config.bucket)))
         command.append("ParameterKey=CronExpression,{}".format(self.get_parameter_value(self.get_cron_expression())))
@@ -226,6 +235,9 @@ class LambdaCronCLI:
         self.update_stack()
 
     def update(self):
+        self.update_stack()
+
+    def start(self):
         self.update_stack()
 
     def delete(self):
