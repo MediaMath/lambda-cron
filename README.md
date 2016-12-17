@@ -164,7 +164,6 @@ Create new **LambdaCron** environment in the AWS account.
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
-* **--enabled (-n)**: Enabled or disabled lambda cron (True | False) (optional)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 #### update
@@ -174,7 +173,24 @@ Update new settings for the environment.
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
-* **--enabled (-n)**: Enabled or disabled lambda cron (True | False) (optional)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
+
+#### start
+
+Enable LambdaCron to run.
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
+
+#### stop
+
+Disable LambdaCron, it won't run until it is enabled (#start command)
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 #### invoke
@@ -320,7 +336,13 @@ Clone this repo
 $ git clone https://github.com/mediamath/lambda-cron.git
 ```
 
-To create your first environment (called 'test') with default settings:
+Install dependencies (you can use a virtualenv):
+
+``` bash
+$ pip install -r requirements.txt
+```
+
+Create your first environment (called 'test') with default settings:
 
 ``` bash
 $ bin/lambda-cron create --environment=test
@@ -345,3 +367,4 @@ Features/Improvements that would like to implement some time soon.
 * Create LambdaCron package to be installed with pip
   * File with settings in ~/.lambda-cron
   * Setting files can include other setting files.
+* Add test for handler function
