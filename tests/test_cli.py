@@ -75,10 +75,10 @@ def test_add_profile_to_create_commands(monkeypatch):
     assert 'my-profile' in lambda_cron.commands_list[3]
 
 
-def test_deploy_command(monkeypatch):
+def test_update_command(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
-    cli_params.command = 'deploy'
+    cli_params.command = 'update'
     cli_params.environment = 'prod'
     cli_params.aws_profile = None
 
@@ -104,10 +104,10 @@ def test_deploy_command(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[3]
 
 
-def test_add_profile_to_deploy_commands(monkeypatch):
+def test_add_profile_to_update_commands(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
-    cli_params.command = 'deploy'
+    cli_params.command = 'update'
     cli_params.environment = 'prod'
     cli_params.aws_profile = 'my-profile'
 
@@ -123,47 +123,47 @@ def test_add_profile_to_deploy_commands(monkeypatch):
     assert 'my-profile' in lambda_cron.commands_list[3]
 
 
-def test_update_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    cli_params = Namespace()
-    cli_params.command = 'update'
-    cli_params.environment = 'prod'
-    cli_params.aws_profile = None
-
-    lambda_cron = LambdaCronCLISpy(cli_params)
-    lambda_cron.run()
-
-    assert len(lambda_cron.commands_list) == 2
-    assert 'update-stack' in lambda_cron.commands_list[0]
-    assert 'LambdaCron-prod' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=CodeS3Key,UsePreviousValue=true' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=Bucket,ParameterValue=test-bucket-custom' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=State,ParameterValue=ENABLED' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=CronExpression,ParameterValue=cron(*/5 * * * ? *)' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=AlarmEmail,ParameterValue=my@email.com' in lambda_cron.commands_list[0]
-    assert 'ParameterKey=AlarmPeriod,ParameterValue=300' in lambda_cron.commands_list[0]
-    assert '--profile' not in lambda_cron.commands_list[0]
-    assert 'stack-update-complete' in lambda_cron.commands_list[1]
-    assert '--profile' not in lambda_cron.commands_list[1]
-
-
-def test_add_profile_to_update_commands(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    cli_params = Namespace()
-    cli_params.command = 'update'
-    cli_params.environment = 'prod'
-    cli_params.aws_profile = 'my-profile'
-
-    lambda_cron = LambdaCronCLISpy(cli_params)
-    lambda_cron.run()
-
-    assert len(lambda_cron.commands_list) == 2
-    assert '--profile' in lambda_cron.commands_list[0]
-    assert 'my-profile' in lambda_cron.commands_list[0]
-    assert '--profile' in lambda_cron.commands_list[1]
-    assert 'my-profile' in lambda_cron.commands_list[1]
+# def test_update_command(monkeypatch):
+#     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+#     cli_params = Namespace()
+#     cli_params.command = 'update'
+#     cli_params.environment = 'prod'
+#     cli_params.aws_profile = None
+#
+#     lambda_cron = LambdaCronCLISpy(cli_params)
+#     lambda_cron.run()
+#
+#     assert len(lambda_cron.commands_list) == 2
+#     assert 'update-stack' in lambda_cron.commands_list[0]
+#     assert 'LambdaCron-prod' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=CodeS3Key,UsePreviousValue=true' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=Bucket,ParameterValue=test-bucket-custom' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=State,ParameterValue=ENABLED' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=CronExpression,ParameterValue=cron(*/5 * * * ? *)' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=AlarmEnabled,ParameterValue=True' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=AlarmEmail,ParameterValue=my@email.com' in lambda_cron.commands_list[0]
+#     assert 'ParameterKey=AlarmPeriod,ParameterValue=300' in lambda_cron.commands_list[0]
+#     assert '--profile' not in lambda_cron.commands_list[0]
+#     assert 'stack-update-complete' in lambda_cron.commands_list[1]
+#     assert '--profile' not in lambda_cron.commands_list[1]
+#
+#
+# def test_add_profile_to_update_commands(monkeypatch):
+#     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+#     cli_params = Namespace()
+#     cli_params.command = 'update'
+#     cli_params.environment = 'prod'
+#     cli_params.aws_profile = 'my-profile'
+#
+#     lambda_cron = LambdaCronCLISpy(cli_params)
+#     lambda_cron.run()
+#
+#     assert len(lambda_cron.commands_list) == 2
+#     assert '--profile' in lambda_cron.commands_list[0]
+#     assert 'my-profile' in lambda_cron.commands_list[0]
+#     assert '--profile' in lambda_cron.commands_list[1]
+#     assert 'my-profile' in lambda_cron.commands_list[1]
 
 
 def test_delete_command(monkeypatch):
@@ -275,10 +275,10 @@ def test_lambda_function_config_II(monkeypatch):
     assert lambda_cron.lambda_function_config == expected_config
 
 
-def test_deploy_command_other_env(monkeypatch):
+def test_update_command_other_env(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
-    cli_params.command = 'deploy'
+    cli_params.command = 'update'
     cli_params.environment = 'other'
     cli_params.aws_profile = None
 
@@ -304,10 +304,10 @@ def test_deploy_command_other_env(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[3]
 
 
-def test_deploy_command_test_env(monkeypatch):
+def test_update_command_test_env(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
-    cli_params.command = 'deploy'
+    cli_params.command = 'update'
     cli_params.environment = 'test'
     cli_params.aws_profile = None
 
@@ -333,10 +333,10 @@ def test_deploy_command_test_env(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[3]
 
 
-def test_deploy_command_develop_env(monkeypatch):
+def test_update_command_develop_env(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
-    cli_params.command = 'deploy'
+    cli_params.command = 'update'
     cli_params.environment = 'develop'
     cli_params.aws_profile = None
 

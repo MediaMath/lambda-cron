@@ -21,10 +21,6 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
-    deploy_command = commands_parser.add_parser('deploy')
-    deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
-
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
@@ -158,7 +154,7 @@ class LambdaCronCLI:
         self.exec_aws_command(s3_upload_command)
 
     def is_deploy_needed(self):
-        return (self.cli.command == 'deploy') or (self.cli.command == 'create')
+        return (self.cli.command == 'update') or (self.cli.command == 'create')
 
     def is_start_stop_command(self):
         return (self.cli.command == 'start') or (self.cli.command == 'stop')
@@ -233,13 +229,13 @@ class LambdaCronCLI:
         self.upload_code_to_s3()
         self.create_stack()
 
-    def deploy(self):
+    def update(self):
         self.zip_code()
         self.upload_code_to_s3()
         self.update_stack()
 
-    def update(self):
-        self.update_stack()
+    # def update(self):
+    #     self.update_stack()
 
     def start(self):
         self.update_stack()
