@@ -37,6 +37,7 @@ def check_arg(args=None):
     deploy_command = commands_parser.add_parser('delete')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
+    deploy_command.add_argument('--delete-bucket', action='store_true', dest='delete_bucket')
 
     deploy_command = commands_parser.add_parser('invoke')
     deploy_command.add_argument('-e', '--environment', required=True)
@@ -274,6 +275,11 @@ class LambdaCronCLI:
             "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(wait_update_stack_command)
+
+        if self.cli.delete_bucket:
+            delete_bucket_command = ["aws", "s3api", "delete-bucket", "--bucket", self.config.bucket]
+            self.exec_aws_command(delete_bucket_command)
+
 
     def invoke(self):
         payload_content = "\"source\": \"LambdaCron-cli-invoke\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}\"]".format(

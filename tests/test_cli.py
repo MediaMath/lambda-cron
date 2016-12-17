@@ -131,6 +131,7 @@ def test_delete_command(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
+    cli_params.delete_bucket = False
     cli_params.aws_profile = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -144,11 +145,35 @@ def test_delete_command(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[1]
 
 
+def test_delete_command_with_delete_bucket(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'delete'
+    cli_params.environment = 'prod'
+    cli_params.delete_bucket = True
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 3
+    assert 'delete-stack' in lambda_cron.commands_list[0]
+    assert 'LambdaCron-prod' in lambda_cron.commands_list[0]
+    assert '--profile' not in lambda_cron.commands_list[0]
+    assert 'stack-delete-complete' in lambda_cron.commands_list[1]
+    assert '--profile' not in lambda_cron.commands_list[1]
+    assert 's3api' in lambda_cron.commands_list[2]
+    assert 'delete-bucket' in lambda_cron.commands_list[2]
+    assert '--bucket' in lambda_cron.commands_list[2]
+    assert 'test-bucket-custom' in lambda_cron.commands_list[2]
+
+
 def test_add_profile_to_delete_commands(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
+    cli_params.delete_bucket = False
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
@@ -181,14 +206,14 @@ def test_invoke_command(monkeypatch):
 def test_add_profile_to_invoke_commands(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
-    cli_params.command = 'delete'
+    cli_params.command = 'invoke'
     cli_params.environment = 'prod'
     cli_params.aws_profile = 'my-profile'
 
     lambda_cron = LambdaCronCLISpy(cli_params)
     lambda_cron.run()
 
-    assert len(lambda_cron.commands_list) == 2
+    assert len(lambda_cron.commands_list) == 1
     assert '--profile' in lambda_cron.commands_list[0]
     assert 'my-profile' in lambda_cron.commands_list[0]
 
