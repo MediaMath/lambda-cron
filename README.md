@@ -164,6 +164,7 @@ Create new **LambdaCron** environment in the AWS account.
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
+* **--create-bucket**: Flag to indicate that bucket must be created in S3 (optional)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 #### update
@@ -209,6 +210,7 @@ Delete **LambdaCron** environment from the AWS account
 Parameters:
 
 * **--environment (-e)**: Environment to work with (string)
+* **--delete-bucket**: Flag to indicate that the bucket must be deleted from S3 (optional)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 
@@ -345,7 +347,7 @@ $ pip install -r requirements.txt
 Create your first environment (called 'test') with default settings:
 
 ``` bash
-$ bin/lambda-cron create --environment=test
+$ bin/lambda-cron create --environment=test --create-bucket
 ```
 
 If you want to set some custom settings create the setting file:
