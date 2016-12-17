@@ -403,3 +403,46 @@ def test_add_profile_to_start_commands(monkeypatch):
     assert 'my-profile' in lambda_cron.commands_list[0]
     assert '--profile' in lambda_cron.commands_list[1]
     assert 'my-profile' in lambda_cron.commands_list[1]
+
+
+def test_stop_command(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'stop'
+    cli_params.environment = 'prod'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 2
+    assert 'update-stack' in lambda_cron.commands_list[0]
+    assert 'LambdaCron-prod' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=CodeS3Key,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=Bucket,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=Environment,ParameterValue=prod' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=State,ParameterValue=DISABLED' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=CronExpression,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmEnabled,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmEmail,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert 'ParameterKey=AlarmPeriod,UsePreviousValue=true' in lambda_cron.commands_list[0]
+    assert '--profile' not in lambda_cron.commands_list[0]
+    assert 'stack-update-complete' in lambda_cron.commands_list[1]
+    assert '--profile' not in lambda_cron.commands_list[1]
+
+
+def test_add_profile_to_stop_commands(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'stop'
+    cli_params.environment = 'prod'
+    cli_params.aws_profile = 'my-profile'
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 2
+    assert '--profile' in lambda_cron.commands_list[0]
+    assert 'my-profile' in lambda_cron.commands_list[0]
+    assert '--profile' in lambda_cron.commands_list[1]
+    assert 'my-profile' in lambda_cron.commands_list[1]

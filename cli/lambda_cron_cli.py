@@ -33,6 +33,10 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
+    deploy_command = commands_parser.add_parser('stop')
+    deploy_command.add_argument('-e', '--environment', required=True)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
+
     deploy_command = commands_parser.add_parser('delete')
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
@@ -238,6 +242,9 @@ class LambdaCronCLI:
         self.update_stack()
 
     def start(self):
+        self.update_stack()
+
+    def stop(self):
         self.update_stack()
 
     def delete(self):
