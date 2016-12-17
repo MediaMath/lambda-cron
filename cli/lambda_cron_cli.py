@@ -19,17 +19,14 @@ def check_arg(args=None):
 
     deploy_command = commands_parser.add_parser('create')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-n', '--enabled', default='')
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('deploy')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-n', '--enabled', default='')
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('update')
     deploy_command.add_argument('-e', '--environment', required=True)
-    deploy_command.add_argument('-n', '--enabled', default='')
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('delete')
@@ -171,12 +168,7 @@ class LambdaCronCLI:
             return "ParameterValue={}".format(value)
 
     def get_state_value(self):
-        if self.cli.enabled == 'False' or self.cli.enabled == 'True':
-            enabled = self.cli.enabled == 'True'
-        else:
-            enabled = self.config.enabled
-
-        if enabled:
+        if self.config.enabled:
             return 'ENABLED'
         else:
             return 'DISABLED'
@@ -184,7 +176,7 @@ class LambdaCronCLI:
     def add_template_parameters(self, command):
         command.append("--parameters")
         command.append("ParameterKey=Environment,ParameterValue={environment}".format(environment=self.cli.environment))
-        command.append("ParameterKey=State,ParameterValue={state}".format(state=self.get_state_value())),
+        command.append("ParameterKey=State,{}".format(self.get_parameter_value(self.get_state_value()))),
         command.append("ParameterKey=CodeS3Key,{}".format(self.get_code_key_parameter()))
         command.append("ParameterKey=Bucket,{}".format(self.get_parameter_value(self.config.bucket)))
         command.append("ParameterKey=CronExpression,{}".format(self.get_parameter_value(self.get_cron_expression())))
