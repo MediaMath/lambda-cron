@@ -504,3 +504,22 @@ def test_check_bucket_bucket_does_not_exist_error(bucket_exists_mock, monkeypatc
         lambda_cron.check_bucket()
 
     assert system_exit.value.code == 2
+
+
+def test_upload_tasks_command(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'upload-tasks'
+    cli_params.environment = 'prod'
+    cli_params.directory = '/path/to/source/directory'
+    cli_params.aws_profile = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+    assert len(lambda_cron.commands_list) == 1
+    assert 's3' in lambda_cron.commands_list[0]
+    assert 'sync' in lambda_cron.commands_list[0]
+    assert '/path/to/source/directory' in lambda_cron.commands_list[0]
+    assert 's3://test-bucket-custom/tasks/' in lambda_cron.commands_list[0]
+    assert '--delete' in lambda_cron.commands_list[0]

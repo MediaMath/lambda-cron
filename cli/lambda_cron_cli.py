@@ -43,6 +43,11 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
+    deploy_command = commands_parser.add_parser('upload-tasks')
+    deploy_command.add_argument('-e', '--environment', required=True)
+    deploy_command.add_argument('-d', '--directory', required=True)
+    deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
+
     return parser.parse_args(args)
 
 
@@ -280,7 +285,6 @@ class LambdaCronCLI:
             delete_bucket_command = ["aws", "s3api", "delete-bucket", "--bucket", self.config.bucket]
             self.exec_aws_command(delete_bucket_command)
 
-
     def invoke(self):
         payload_content = "\"source\": \"LambdaCron-cli-invoke\", \"time\": \"{time}\", \"resources\": [\"Manual:invoke/LambdaCron-{environment}\"]".format(
             time=datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -295,8 +299,14 @@ class LambdaCronCLI:
         ]
         self.exec_aws_command(invoke_command)
 
+    def upload_tasks(self):
+        delete_stack_command = [
+            "aws", "s3", "sync", self.cli.directory, "s3://{}/tasks/".format(self.config.bucket), '--delete'
+        ]
+        self.exec_aws_command(delete_stack_command)
+
     def run(self):
-        command_method = getattr(self, self.cli.command)
+        command_method = getattr(self, self.cli.command.replace('-', '_'))
         command_method()
 
 
