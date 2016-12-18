@@ -4,8 +4,8 @@
 **LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
 on AWS cloud and all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
 
-Tasks are scheduled using the same syntax for expressions as well known
-linux [crontab](https://help.ubuntu.com/community/CronHowto).
+Tasks are scheduled using the same syntax for expressions as linux 
+[crontab](https://help.ubuntu.com/community/CronHowto).
 
 **LambdaCron** offer 3 different type of task to run:
 
@@ -13,7 +13,7 @@ linux [crontab](https://help.ubuntu.com/community/CronHowto).
 * **Lambda task**: invoke AWS lambda function.
 * **HTTP task**: send HTTP requests (GET & POST).
 
-Tasks are defined in YAML files and are stored on a S3 bucket.
+Tasks are defined in YAML files and are stored in a S3 bucket.
 
 ## LambdaCron CLI
 
@@ -31,9 +31,8 @@ There are 3 levels of preferences for settings:
 * Global: Custom values that will have effect to all environments created.
 * Default: Default value for options in case no custom values are specified (by environment or globally)
 
-First level of preference is *Environment*, followed by *Global* and finally *Default*. When creating
-and environment some settings can be customized by environment, others globally and others with default
-values.
+Highest level of preference is *Environment*, followed by *Global* and finally *Default*. Each option 
+in the settings can set the value from different levels. Higher level of preference overwrite lower levels.
 
 Settings are saved in a YAML file. Each environment is defined with a root key the YAML
 as the global settings with the key *global*.
@@ -216,7 +215,7 @@ Parameters:
 #### upload-tasks
 
 Upload tasks to S3 bucket to run with lambda-cron. It will sync the directory
-deleting tasks have been deleted from local.
+with S3 deleting tasks have been deleted from the local directory.
 
 Parameters:
 
@@ -227,12 +226,12 @@ Parameters:
 
 ## Tasks
 
-Tasks are defined in YAML files, every task in an independent file. The keys that
-mast contains every task are:
+Tasks are defined in YAML files, each task in an independent file. The keys that
+must contains every task are:
 
 * **name**: task name
 * **expression**: crontab expression
-* **type**: task type (queue | lambda | http)
+* **type**: task type (**queue** | **lambda** | **http**)
 * **task**: task definition (customized for each type of tasks)
 
 ### Queue task
@@ -262,7 +261,7 @@ All parameters of the function will be supported soon.
 
 ### Lambda task
 
-It invokes and AWS lambda functions.
+It invokes an AWS lambda functions.
 The task definition must contains following keys
 
 * **FunctionName**: Name of the lambda function to invoke (string)
@@ -316,7 +315,7 @@ All http methods will be supported soon.
 
 ## Frequency
 
-When setting up the frequency of **LambdaCron** you must have into account followingthings.
+When setting up the frequency of **LambdaCron** you must have into account following things.
 
 ####  Higher frequency is 1 minute
 
@@ -331,11 +330,11 @@ Be aware of this.
 ####  Higher frequency for a task is LambdaCron frequency.
 
 It means that if LambdaCron run every hour and the task expression is set for every 15 min. the task
-will run once an hour.
+will run once an hour. When LambdaCron runs it will executed all tasks scheduled for the period of
+time until next execution.
 
-When LambdaCron runs it will executed all tasks scheduled for the period of time until next execution. 
-For example, if LambdaCron runs every hour (at min. 0) and the is a task scheduled for minute 30 it will
-run at minute 0, LambdaCron will run again next hour.
+For example, if LambdaCron runs every hour (at mininute 00) and there is a task scheduled for minute 30, it will
+run at minute 00. LambdaCron will run again next hour.
 
 ## Getting Started
 
@@ -361,6 +360,19 @@ If you want to set some custom settings create the setting file:
 
 * config/cli.yml
 
+For help:
+
+``` bash
+$ bin/lambda-cron --help
+```
+
+or for each command:
+
+``` bash
+$ bin/lambda-cron create --help
+```
+
+
 ## TODO
 
 Features/Improvements that would like to implement some time soon.
@@ -371,8 +383,8 @@ Features/Improvements that would like to implement some time soon.
 * Support all HTTP methods in [Requests](http://docs.python-requests.org/en/master/)
 * Improve CLI output.
 * Add new commands:
-  * Upload tasks to S3
   * Manage/show logs
+  * Check state
 * Create LambdaCron package to be installed with pip
   * File with settings in ~/.lambda-cron
   * Setting files can include other setting files.
