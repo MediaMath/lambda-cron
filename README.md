@@ -213,9 +213,16 @@ Parameters:
 * **--delete-bucket**: Flag to indicate that the bucket must be deleted from S3 (optional)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
+#### upload-tasks
 
-**Important!*: if parameter **--enabled (-n)** is specified it will overwrite 
-setting value for **enabled**.
+Upload tasks to S3 bucket to run with lambda-cron. It will sync the directory
+deleting tasks have been deleted from local.
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--directory (-d)**: Path to directory that contains tasks definitions (string)
+* **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
 
 ## Tasks
