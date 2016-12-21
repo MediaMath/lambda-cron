@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
 # LambdaCron
 
+![LambdaCron](./lambda-cron.png "LambdaCron")
+
 **LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
 on AWS cloud and all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
 
