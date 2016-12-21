@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/MediaMath/knox-lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
+[![Build Status](https://travis-ci.com/MediaMath/lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/knox-lambda-cron)
 # LambdaCron
 
 ![LambdaCron](./lambda-cron.png "LambdaCron")
@@ -19,7 +19,7 @@ Tasks are defined in YAML files and are stored in a S3 bucket.
 
 ## LambdaCron CLI
 
-**LambdaCron** provide a CLI tool that allow to manage you cron tasks from you localhost,
+**LambdaCron** providfe a CLI tool that allow to manage you cron tasks from you localhost,
 without needing to access to AWS console.
 
 Also it allows to run multiple environments with different settings. As many environments
