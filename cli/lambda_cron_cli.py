@@ -96,8 +96,9 @@ class LambdaCronCLI:
 
     def install_dependencies(self):
         pip_install_command = ["pip", "install", "--requirement",
-                               os.path.join(config_cli.get_project_root_directory(), 'requirements.txt'), "--target",
-                               self.get_dependencies_directory(), "--ignore-installed"]
+                               os.path.join(config_cli.get_project_root_directory(), 'requirements.txt'),
+                               "--target", self.get_dependencies_directory(),
+                               "--ignore-installed"]
         os.mkdir(self.get_dependencies_directory())
         self.exec_command(pip_install_command)
 

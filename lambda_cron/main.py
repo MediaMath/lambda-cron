@@ -35,7 +35,9 @@ def handler(event, _):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(CONFIG['bucket'])
 
-    cron_checker = CronChecker(event['time'], hour_period=CONFIG['hours'], minutes_period=CONFIG['minutes'])
+    cron_checker = CronChecker(event['time'],
+                               hour_period=CONFIG['frequency']['hours'],
+                               minutes_period=CONFIG['frequency']['minutes'])
     task_runner = TaskRunner(cron_checker)
 
     for obj in bucket.objects.filter(Prefix=TASKS_PREFIX):

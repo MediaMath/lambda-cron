@@ -307,6 +307,7 @@ All http methods will be supported soon.
 ## Requirements
 
 * Python 2.7
+* boto3
 * pip
 * AWS account
 * awscli (configured)
