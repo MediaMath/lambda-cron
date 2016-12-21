@@ -212,6 +212,8 @@ Parameters:
 * **--delete-bucket**: Flag to indicate that the bucket must be deleted from S3 (optional)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
+Note: To delete de bucket it must be empty.
+
 #### upload-tasks
 
 Upload tasks to S3 bucket to run with lambda-cron. It will sync the directory
