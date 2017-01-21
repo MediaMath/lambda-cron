@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "LambdaCron v0.0.1",
+  "description": "JSON schema for LambdaCron tasks",
+  "properties": {
+    "name": {
+      "type": "string",
+    },
+    "expression": {
+      "type": "string",
+      "pattern": "^. . . . ."
+    },
+    "task": {
+      "oneOf" : [
+        {
+          "properties": {
+            "type": { "type": "string", "enum": ["queue"] },
+            "QueueName": { "type": "string" },
+            "MessageBody": { "type": "object" }
+          },
+          "required": ["type", "QueueName", "MessageBody"]
+        },
+        {
+          "properties": {
+            "type": { "type": "string", "enum": ["lambda"] },
+            "FunctionName": { "type": "string" },
+            "InvokeArgs": { "type": "object" }
+          },
+          "required": ["type", "FunctionName", "InvokeArgs"]
+        },
+        {
+          "properties": {
+            "type": { "type": "string", "enum": ["http"] },
+            "method": { "type": "string", "enum": ["GET", "get", "POST", "post"]},
+            "request": { "type": "object" }
+          },
+          "required": ["type", "method", "request"]
+        }
+      ]
+    }
+  },
+  "required": ["name", "expression", "task"]
+}
