@@ -317,7 +317,11 @@ class LambdaCronCLI:
             schema = json.load(schema_file)
         with open(self.cli.task_file, 'r') as task_file:
             task = yaml.load(task_file)
-        jsonschema.validate(task, schema)
+        try:
+            jsonschema.validate(task, schema)
+        except jsonschema.exceptions.ValidationError, ex:
+            sys.exit('Validation failed. Validation error:' + ex.message)
+        print 'Validation success!'
 
     def run(self):
         command_method = getattr(self, self.cli.command.replace('-', '_'))
