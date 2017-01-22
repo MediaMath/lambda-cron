@@ -1,0 +1,10 @@
+name: 'test http get task'
+expression: '0 11 * * *'
+task:
+  type: 'http'
+  method: 'GET'
+  request:
+    url: 'http://lambda-cron.com/tests'
+    params:
+      param_1: 'param_value_1'
+      param_2: 2

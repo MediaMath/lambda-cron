@@ -31,7 +31,7 @@
         {
           "properties": {
             "type": { "type": "string", "enum": ["http"] },
-            "method": { "type": "string", "enum": ["GET", "get", "POST", "post"]},
+            "method": { "type": "string", "enum": ["GET", "get", "Get", "POST", "post", "Post"]},
             "request": { "type": "object" }
           },
           "required": ["type", "method", "request"]
