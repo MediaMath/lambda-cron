@@ -13,6 +13,10 @@ def get_cli_config_file_path():
     return os.path.join(get_project_root_directory(), 'config/cli.yml')
 
 
+def get_jsonschema_file_path():
+    return os.path.join(get_project_root_directory(), 'schema.json')
+
+
 def load_config():
     if os.path.exists(get_cli_config_file_path()):
         with open(get_cli_config_file_path(), 'r') as config_file:

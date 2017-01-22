@@ -11,6 +11,8 @@ from zipfile import ZipFile
 from config_cli import ConfigCli
 import config_cli
 import yaml
+import json
+import jsonschema
 
 
 def check_arg(args=None):
@@ -47,6 +49,10 @@ def check_arg(args=None):
     deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-d', '--directory', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
+
+    deploy_command = commands_parser.add_parser('validate')
+    deploy_command.add_argument('-e', '--environment', required=True)
+    deploy_command.add_argument('-t', '--task-file', required=True, dest='task_file')
 
     return parser.parse_args(args)
 
@@ -305,6 +311,13 @@ class LambdaCronCLI:
             "aws", "s3", "sync", self.cli.directory, "s3://{}/tasks/".format(self.config.bucket), '--delete'
         ]
         self.exec_aws_command(delete_stack_command)
+
+    def validate(self):
+        with open(config_cli.get_jsonschema_file_path(), 'r') as schema_file:
+            schema = json.load(schema_file)
+        with open(self.cli.task_file, 'r') as task_file:
+            task = yaml.load(task_file)
+        jsonschema.validate(task, schema)
 
     def run(self):
         command_method = getattr(self, self.cli.command.replace('-', '_'))
