@@ -320,7 +320,8 @@ class LambdaCronCLI:
         try:
             jsonschema.validate(task, schema)
         except jsonschema.exceptions.ValidationError, ex:
-            sys.exit('Validation failed. Validation error:' + ex.message)
+            print('Validation failed! Validation error:' + ex.message)
+            sys.exit(1)
         print 'Validation success!'
 
     def run(self):
