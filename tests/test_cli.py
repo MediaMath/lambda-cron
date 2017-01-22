@@ -19,7 +19,7 @@ def invalid_config_file_path():
 
 
 def get_test_task_path(task_file_name):
-    return os.path.join(resources_directory_path(), task_file_name)
+    return os.path.join(resources_directory_path(), 'tasks', task_file_name)
 
 
 class LambdaCronCLISpy(LambdaCronCLI):
@@ -538,7 +538,8 @@ def test_validate_command_queue_task(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.environment = 'prod'
-    cli_params.task_file = get_test_task_path('queue_task.yml')
+    cli_params.task_file = get_test_task_path('valid/queue_task.yml')
+    cli_params.task_directory = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
     lambda_cron.run()
@@ -549,7 +550,8 @@ def test_validate_command_http_get_task(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.environment = 'prod'
-    cli_params.task_file = get_test_task_path('http_get_task.yml')
+    cli_params.task_file = get_test_task_path('valid/http_get_task.yml')
+    cli_params.task_directory = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
     lambda_cron.run()
@@ -560,7 +562,8 @@ def test_validate_command_http_post_task(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.environment = 'prod'
-    cli_params.task_file = get_test_task_path('http_post_task.yml')
+    cli_params.task_file = get_test_task_path('valid/http_post_task.yml')
+    cli_params.task_directory = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
     lambda_cron.run()
@@ -571,7 +574,8 @@ def test_validate_command_lambda_task(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.environment = 'prod'
-    cli_params.task_file = get_test_task_path('lambda_task.yml')
+    cli_params.task_file = get_test_task_path('valid/lambda_task.yml')
+    cli_params.task_directory = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
     lambda_cron.run()
@@ -582,7 +586,8 @@ def test_validate_command_with_error(monkeypatch):
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.environment = 'prod'
-    cli_params.task_file = get_test_task_path('invalid_task.yml')
+    cli_params.task_file = get_test_task_path('invalid/invalid_task.yml')
+    cli_params.task_directory = None
 
     lambda_cron = LambdaCronCLISpy(cli_params)
 
