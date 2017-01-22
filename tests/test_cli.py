@@ -7,7 +7,7 @@ from argparse import Namespace
 
 
 def resources_directory_path():
-    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),'resources'))
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources'))
 
 
 def valid_cong_file_path():
@@ -588,6 +588,34 @@ def test_validate_command_with_error(monkeypatch):
     cli_params.environment = 'prod'
     cli_params.task_file = get_test_task_path('invalid/invalid_task.yml')
     cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+
+    with pytest.raises(SystemExit) as system_exit:
+        lambda_cron.run()
+
+    assert system_exit.value.code == 1
+
+
+def test_validate_command_directory(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.environment = 'prod'
+    cli_params.task_file = None
+    cli_params.task_directory = os.path.join(resources_directory_path(), 'tasks', 'valid')
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+
+def test_validate_command_directory_error(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.environment = 'prod'
+    cli_params.task_file = None
+    cli_params.task_directory = os.path.join(resources_directory_path(), 'tasks')
 
     lambda_cron = LambdaCronCLISpy(cli_params)
 
