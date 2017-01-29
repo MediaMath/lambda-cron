@@ -227,6 +227,17 @@ Parameters:
 * **--directory (-d)**: Path to directory that contains tasks definitions (string)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
+#### validate
+
+Validate a tasks checking if they match with the schema. It can validate a task
+from a file or a set of tasks in a directory.
+
+Parameters:
+
+* **--environment (-e)**: Environment to work with (string)
+* **--task-file (-t)**: File that contains a task definition.
+* **--task-directory (-d)**: Directory with a set of files with tasks definitions.
+
 
 ## Tasks
 
