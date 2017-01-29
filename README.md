@@ -235,7 +235,7 @@ from a file or a set of tasks in a directory.
 Parameters:
 
 * **--task-file (-t)**: File that contains a task definition.
-* **--task-directory (-d)**: Directory with a set of files with tasks definitions.
+* **--task-directory (-d)**: Directory with a set of files with taqsks definitions.
 
 
 ## Tasks
@@ -377,9 +377,10 @@ Create your first environment (called 'test') with default settings:
 $ bin/lambda-cron create --environment=test --create-bucket
 ```
 
-If you want to set some custom settings create the setting file:
+If you want to set some custom settings create the setting file in the home
+directory of the user is running the tool.
 
-* config/cli.yml
+* ~/lambdacron.yml
 
 For help:
 
