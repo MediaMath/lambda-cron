@@ -234,7 +234,6 @@ from a file or a set of tasks in a directory.
 
 Parameters:
 
-* **--environment (-e)**: Environment to work with (string)
 * **--task-file (-t)**: File that contains a task definition.
 * **--task-directory (-d)**: Directory with a set of files with tasks definitions.
 

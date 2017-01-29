@@ -537,7 +537,6 @@ def test_validate_command_queue_task(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = get_test_task_path('valid/queue_task.yml')
     cli_params.task_directory = None
 
@@ -549,7 +548,6 @@ def test_validate_command_http_get_task(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = get_test_task_path('valid/http_get_task.yml')
     cli_params.task_directory = None
 
@@ -561,7 +559,6 @@ def test_validate_command_http_post_task(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = get_test_task_path('valid/http_post_task.yml')
     cli_params.task_directory = None
 
@@ -573,7 +570,6 @@ def test_validate_command_lambda_task(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = get_test_task_path('valid/lambda_task.yml')
     cli_params.task_directory = None
 
@@ -585,7 +581,6 @@ def test_validate_command_with_error(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = get_test_task_path('invalid/invalid_task.yml')
     cli_params.task_directory = None
 
@@ -601,7 +596,6 @@ def test_validate_command_directory(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = None
     cli_params.task_directory = os.path.join(resources_directory_path(), 'tasks', 'valid')
 
@@ -613,7 +607,6 @@ def test_validate_command_directory_error(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
-    cli_params.environment = 'prod'
     cli_params.task_file = None
     cli_params.task_directory = os.path.join(resources_directory_path(), 'tasks')
 

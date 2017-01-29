@@ -51,7 +51,6 @@ def check_arg(args=None):
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
     deploy_command = commands_parser.add_parser('validate')
-    deploy_command.add_argument('-e', '--environment', required=True)
     deploy_command.add_argument('-t', '--task-file', required=False, dest='task_file')
     deploy_command.add_argument('-d', '--task-directory', required=False, dest='task_directory')
 
@@ -81,7 +80,8 @@ class LambdaCronCLI:
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
-        self.config = ConfigCli(self.cli.environment)
+        if 'environment' in self.cli:
+            self.config = ConfigCli(self.cli.environment)
 
     def get_tmp_directory(self):
         return '/tmp/LambdaCron-{environment}'.format(environment=self.cli.environment)
