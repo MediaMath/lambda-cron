@@ -41,9 +41,12 @@ class ConfigCli:
         self.set_alarm()
         self.set_frequency()
 
+    def is_environment_in_config_file(self):
+        return self.config and (self.environment in self.config)
+
     def set_alarm(self):
         alarm_config = None
-        if self.config and (self.environment in self.config) and ('alarm' in self.config[self.environment]):
+        if self.is_environment_in_config_file() and ('alarm' in self.config[self.environment]):
             alarm_config = self.config[self.environment]['alarm']
         elif self.config and ('all' in self.config) and ('alarm' in self.config['all']):
             alarm_config = self.config['all']['alarm']
@@ -60,7 +63,7 @@ class ConfigCli:
             self.alarm_email = alarm_config['email']
 
     def set_bucket(self):
-        if self.config and (self.environment in self.config) and ('bucket' in self.config[self.environment]):
+        if self.is_environment_in_config_file() and ('bucket' in self.config[self.environment]):
             self.bucket = self.config[self.environment]['bucket']
         elif self.config and ('all' in self.config) and ('bucket' in self.config['all']):
             if '{environment}' in self.config['all']['bucket']:
@@ -70,7 +73,7 @@ class ConfigCli:
 
     def set_frequency(self):
         config_every = None
-        if self.config and (self.environment in self.config) and ('every' in self.config[self.environment]):
+        if self.is_environment_in_config_file() and ('every' in self.config[self.environment]):
             config_every = self.config[self.environment]['every']
         elif self.config and ('all' in self.config) and ('every' in self.config['all']):
             config_every = self.config['all']['every']
@@ -89,7 +92,7 @@ class ConfigCli:
             self.hours = False
 
     def set_enabled(self):
-        if self.config and (self.environment in self.config) and ('enabled' in self.config[self.environment]):
+        if self.is_environment_in_config_file() and ('enabled' in self.config[self.environment]):
             self.enabled = self.config[self.environment]['enabled']
         elif self.config and ('all' in self.config) and ('enabled' in self.config['all']):
             self.enabled = self.config['all']['enabled']

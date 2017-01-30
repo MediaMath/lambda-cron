@@ -18,52 +18,57 @@ def test_should_use_custom_for_environment(monkeypatch):
     assert config.alarm_enabled
     assert config.alarm_email == 'my@email.com'
     assert config.minutes == 5
-    assert config.hours == False
+    assert not config.hours
     assert config.enabled
+    assert config.is_environment_in_config_file()
 
 
 def test_should_use_for_all_environment(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     config = cli.config_cli.ConfigCli('other')
     assert config.bucket == 'test-bucket-all-other'
-    assert config.alarm_enabled == False
+    assert not config.alarm_enabled
     assert config.alarm_email == ''
-    assert config.minutes == False
+    assert not config.minutes
     assert config.hours == 2
     assert config.enabled
+    assert not config.is_environment_in_config_file()
 
 
 def test_should_use_custom_and_all_environment_2(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     config = cli.config_cli.ConfigCli('staging')
     assert config.bucket == 'test-bucket-all-staging'
-    assert config.alarm_enabled == False
+    assert not config.alarm_enabled
     assert config.alarm_email == ''
-    assert config.minutes == False
+    assert not config.minutes
     assert config.hours == 2
     assert config.enabled
+    assert config.is_environment_in_config_file()
 
 
 def test_should_use_global_default_settings(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', invalid_config_file_path)
     config = cli.config_cli.ConfigCli('test')
     assert config.bucket == 'lambda-cron-test'
-    assert config.alarm_enabled == False
+    assert not config.alarm_enabled
     assert config.alarm_email == ''
-    assert config.minutes == False
+    assert not config.minutes
     assert config.hours == 1
     assert config.enabled
+    assert not config.is_environment_in_config_file()
 
 
 def test_using_custom_settings(monkeypatch):
     monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
     config = cli.config_cli.ConfigCli('develop')
     assert config.bucket == 'test-bucket-all-develop'
-    assert config.alarm_enabled == True
+    assert config.alarm_enabled
     assert config.alarm_email == 'develop@email.com'
-    assert config.minutes == False
+    assert not config.minutes
     assert config.hours == 1
-    assert config.enabled == False
+    assert not config.enabled
+    assert config.is_environment_in_config_file()
 
 
 def test_alarm_raise_exception_when_invalid_values_for_enabled(monkeypatch):
