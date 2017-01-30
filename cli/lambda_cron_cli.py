@@ -80,8 +80,11 @@ class LambdaCronCLI:
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
-        if 'environment' in self.cli:
+        if self.is_config_required():
             self.config = ConfigCli(self.cli.environment)
+
+    def is_config_required(self):
+        return 'environment' in self.cli
 
     def get_tmp_directory(self):
         return '/tmp/LambdaCron-{environment}'.format(environment=self.cli.environment)
@@ -344,7 +347,15 @@ class LambdaCronCLI:
             raise ex
         print 'Validation success!'
 
+    def print_summary(self):
+        if self.config.is_environment_in_config_file():
+            print "Environment found in LambdaCron config"
+        else:
+            print "Environment NOT found in LambdaCron config"
+
     def run(self):
+        if self.is_config_required():
+            self.print_summary()
         command_method = getattr(self, self.cli.command.replace('-', '_'))
         command_method()
 

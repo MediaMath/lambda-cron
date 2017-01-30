@@ -10,7 +10,7 @@ def get_project_root_directory():
 
 
 def get_cli_config_file_path():
-    return os.path.abspath('~/.lambdacron.yml')
+    return os.path.expanduser('~/.lambdacron.yml')
 
 
 def get_jsonschema_file_path():
@@ -21,7 +21,7 @@ def load_config():
     if os.path.exists(get_cli_config_file_path()):
         with open(get_cli_config_file_path(), 'r') as config_file:
             return yaml.load(config_file)
-    return None
+    return False
 
 
 class ConfigCli:
