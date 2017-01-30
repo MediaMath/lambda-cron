@@ -311,10 +311,10 @@ class LambdaCronCLI:
         self.exec_aws_command(invoke_command)
 
     def upload_tasks(self):
-        delete_stack_command = [
+        upload_tasks_stack_command = [
             "aws", "s3", "sync", self.cli.directory, "s3://{}/tasks/".format(self.config.bucket), '--delete'
         ]
-        self.exec_aws_command(delete_stack_command)
+        self.exec_aws_command(upload_tasks_stack_command)
 
     def validate_task(self, schema, task_file_name):
         try:
