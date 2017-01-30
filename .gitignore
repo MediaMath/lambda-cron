@@ -19,5 +19,3 @@ sample/
 # IntelliJ IDEs
 .idea/
 
-# LambdaCron config
-config/

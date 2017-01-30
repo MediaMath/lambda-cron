@@ -27,6 +27,7 @@ def sqs_queue_spy():
 
 QUEUE_TASK_BODY =\
     {
+        'type': 'queue',
         'QueueName': 'test-queue',
         'MessageBody': {
             'message_key_1': 'message_value_1',
@@ -40,7 +41,6 @@ def queue_task_definition():
     return {
         'name': 'Test task',
         'expression': '0 11 * * *',
-        'type': 'queue',
         'task': dict(QUEUE_TASK_BODY)
     }
 
@@ -55,7 +55,7 @@ def test_expression_not_defined(cron_checker, queue_task_definition):
 
 def test_type_not_defined(cron_checker, queue_task_definition):
     task_runner = TaskRunner(cron_checker)
-    queue_task_definition.pop('type', None)
+    queue_task_definition['task'].pop('type', None)
     with pytest.raises(KeyError) as exception_info:
         task_runner.run(queue_task_definition)
     exception_info.match(r'type')
@@ -71,7 +71,7 @@ def test_task_not_defined(cron_checker, queue_task_definition):
 
 def test_invalid_task_type(cron_checker, queue_task_definition):
     task_runner = TaskRunner(cron_checker)
-    queue_task_definition['type'] = 'unknown'
+    queue_task_definition['task']['type'] = 'unknown'
     with pytest.raises(AttributeError) as exception_info:
         task_runner.run(queue_task_definition)
     exception_info.match(r'TaskRunner instance has no attribute')
@@ -143,6 +143,7 @@ def lambda_client_spy():
 
 LAMBDA_TASK_BODY =\
     {
+        'type': 'lambda',
         'FunctionName': 'testing-function',
         'InvokeArgs': {
             'my_input_1': 'value_input_1',
@@ -156,7 +157,6 @@ def lambda_task_definition():
     return {
         'name': 'Test task',
         'expression': '0 11 * * *',
-        'type': 'lambda',
         'task': dict(LAMBDA_TASK_BODY)
     }
 
@@ -231,6 +231,7 @@ def http_client_spy():
 
 HTTP_GET_TASK_BODY =\
     {
+        'type': 'http',
         'method': 'GET',
         'request': {
             'url': 'http://lambda-cron.com/tests',
@@ -244,6 +245,7 @@ HTTP_GET_TASK_BODY =\
 
 HTTP_POST_TASK_BODY =\
     {
+        'type': 'http',
         'method': 'POST',
         'request': {
             'url': 'http://lambda-cron.com/tests',
@@ -260,7 +262,6 @@ def http_get_task_definition():
     return {
         'name': 'Test task',
         'expression': '0 11 * * *',
-        'type': 'http',
         'task': dict(HTTP_GET_TASK_BODY)
     }
 

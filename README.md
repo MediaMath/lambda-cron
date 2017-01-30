@@ -227,30 +227,44 @@ Parameters:
 * **--directory (-d)**: Path to directory that contains tasks definitions (string)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
+#### validate
+
+Validate a tasks checking if they match with the schema. It can validate a task
+from a file or a set of tasks in a directory.
+
+Parameters:
+
+* **--task-file (-t)**: File that contains a task definition.
+* **--task-directory (-d)**: Directory with a set of files with taqsks definitions.
+
 
 ## Tasks
 
-Tasks are defined in YAML files, each task in an independent file. The keys that
-must contains every task are:
+Tasks are defined in YAML files, each task in an independent file. Task must follow
+the json schema provided in this repo: [schema](./schema.json).
+
+All tasks must contains following keys and values:
 
 * **name**: task name
 * **expression**: crontab expression
-* **type**: task type (**queue** | **lambda** | **http**)
 * **task**: task definition (customized for each type of tasks)
+
+For each kind of task there a set of specific keys a values to set. Described bellow.
 
 ### Queue task
 
 It sends a message to a AWS SQS queue.
 The task definition must contains following keys:
 
+* **type**: *queue*
 * **QueueName**: Name of the queue (string)
 * **MessageBody**: Message to be sent (YAML/JSON)
 
 ``` yaml
 name: 'Send performance report every morning'
 expression: '0 9 * * *'
-type: 'queue'
 task:
+  type: 'queue'
   QueueName: 'my-scheduler-queue'
   MessageBody:
     name: 'Performance report'
@@ -268,14 +282,15 @@ All parameters of the function will be supported soon.
 It invokes an AWS lambda functions.
 The task definition must contains following keys
 
+* **type**: *lambda*
 * **FunctionName**: Name of the lambda function to invoke (string)
 * **InvokeArgs**: arguments to send (YAML/JSON)
 
 ``` yaml
 name: 'Run ETL process every hour'
 expression: '0 * * * *'
-type: 'lambda'
 task:
+  type: 'lambda'
   FunctionName: 'run-etl-process-prod'
   InvokeArgs:
     source: 's3://my-data-source/performance'
@@ -289,14 +304,15 @@ Function is invoked using [boto3 Lambda.Client.invoke_async](http://boto3.readth
 It send and HTTP request (GET or POST).
 The task definition must contains following keys:
 
+* **type**: *http*
 * **method**: http method (get | post)
 * **request**: YAML with parameters to send for the selected method using [Requests](http://docs.python-requests.org/en/master/)
 
 ``` yaml
 name: 'helth check every hour'
 expression: '0 * * * *'
-type: 'http'
 task:
+  type: 'http'
   method: 'get'
   request:
     url: 'http://helthcheck.my-domain.com'
@@ -361,9 +377,10 @@ Create your first environment (called 'test') with default settings:
 $ bin/lambda-cron create --environment=test --create-bucket
 ```
 
-If you want to set some custom settings create the setting file:
+If you want to set some custom settings create the setting file in the home
+directory of the user is running the tool.
 
-* config/cli.yml
+* ~/lambdacron.yml
 
 For help:
 

@@ -10,7 +10,11 @@ def get_project_root_directory():
 
 
 def get_cli_config_file_path():
-    return os.path.join(get_project_root_directory(), 'config/cli.yml')
+    return os.path.abspath('~/.lambdacron.yml')
+
+
+def get_jsonschema_file_path():
+    return os.path.join(get_project_root_directory(), 'schema.json')
 
 
 def load_config():

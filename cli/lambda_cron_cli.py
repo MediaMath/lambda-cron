@@ -11,6 +11,8 @@ from zipfile import ZipFile
 from config_cli import ConfigCli
 import config_cli
 import yaml
+import json
+import jsonschema
 
 
 def check_arg(args=None):
@@ -48,6 +50,10 @@ def check_arg(args=None):
     deploy_command.add_argument('-d', '--directory', required=True)
     deploy_command.add_argument('-a', '--aws-profile', default=None, dest='aws_profile')
 
+    deploy_command = commands_parser.add_parser('validate')
+    deploy_command.add_argument('-t', '--task-file', required=False, dest='task_file')
+    deploy_command.add_argument('-d', '--task-directory', required=False, dest='task_directory')
+
     return parser.parse_args(args)
 
 
@@ -74,7 +80,8 @@ class LambdaCronCLI:
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
-        self.config = ConfigCli(self.cli.environment)
+        if 'environment' in self.cli:
+            self.config = ConfigCli(self.cli.environment)
 
     def get_tmp_directory(self):
         return '/tmp/LambdaCron-{environment}'.format(environment=self.cli.environment)
@@ -305,6 +312,37 @@ class LambdaCronCLI:
             "aws", "s3", "sync", self.cli.directory, "s3://{}/tasks/".format(self.config.bucket), '--delete'
         ]
         self.exec_aws_command(delete_stack_command)
+
+    def validate_task(self, schema, task_file_name):
+        try:
+            with open(task_file_name, 'r') as task_file:
+                task = yaml.load(task_file)
+            jsonschema.validate(task, schema)
+        except Exception, ex:
+            raise ex
+
+    def validate(self):
+        try:
+            with open(config_cli.get_jsonschema_file_path(), 'r') as schema_file:
+                schema = json.load(schema_file)
+
+            if self.cli.task_file:
+                self.validate_task(schema, self.cli.task_file)
+
+            if self.cli.task_directory:
+                all_yml_files = [os.path.join(dirpath, f)
+                                 for dirpath, dirnames, files in os.walk(self.cli.task_directory)
+                                 for f in files if f.endswith('.yml')]
+                print all_yml_files
+                for file_name in all_yml_files:
+                    print file_name
+                    self.validate_task(schema, file_name)
+        except jsonschema.exceptions.ValidationError, ex:
+            print("Validation failed! Validation error in task: {}".format(ex.message))
+            sys.exit(1)
+        except Exception, ex:
+            raise ex
+        print 'Validation success!'
 
     def run(self):
         command_method = getattr(self, self.cli.command.replace('-', '_'))

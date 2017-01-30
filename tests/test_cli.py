@@ -6,12 +6,20 @@ from mock import patch
 from argparse import Namespace
 
 
+def resources_directory_path():
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources'))
+
+
 def valid_cong_file_path():
-    return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/config.yml'))
+    return os.path.join(resources_directory_path(), 'config.yml')
 
 
 def invalid_config_file_path():
     return '/tmp/no_existing_config.yml'
+
+
+def get_test_task_path(task_file_name):
+    return os.path.join(resources_directory_path(), 'tasks', task_file_name)
 
 
 class LambdaCronCLISpy(LambdaCronCLI):
@@ -523,3 +531,88 @@ def test_upload_tasks_command(monkeypatch):
     assert '/path/to/source/directory' in lambda_cron.commands_list[0]
     assert 's3://test-bucket-custom/tasks/' in lambda_cron.commands_list[0]
     assert '--delete' in lambda_cron.commands_list[0]
+
+
+def test_validate_command_queue_task(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = get_test_task_path('valid/queue_task.yml')
+    cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+
+def test_validate_command_http_get_task(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = get_test_task_path('valid/http_get_task.yml')
+    cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+
+def test_validate_command_http_post_task(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = get_test_task_path('valid/http_post_task.yml')
+    cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+
+def test_validate_command_lambda_task(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = get_test_task_path('valid/lambda_task.yml')
+    cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+
+def test_validate_command_with_error(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = get_test_task_path('invalid/invalid_task.yml')
+    cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+
+    with pytest.raises(SystemExit) as system_exit:
+        lambda_cron.run()
+
+    assert system_exit.value.code == 1
+
+
+def test_validate_command_directory(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = None
+    cli_params.task_directory = os.path.join(resources_directory_path(), 'tasks', 'valid')
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+    lambda_cron.run()
+
+
+def test_validate_command_directory_error(monkeypatch):
+    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = None
+    cli_params.task_directory = os.path.join(resources_directory_path(), 'tasks')
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+
+    with pytest.raises(SystemExit) as system_exit:
+        lambda_cron.run()
+
+    assert system_exit.value.code == 1

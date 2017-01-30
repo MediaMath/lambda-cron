@@ -1,0 +1,8 @@
+name: 'test queue task'
+expression: '0 a * * *'
+task:
+  type: 'queue'
+  QueueName: 'test-queue'
+  MessageBody:
+    message_key_1: 'message_value_1'
+    message_key_2: ['message_value_2']
