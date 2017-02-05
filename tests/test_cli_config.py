@@ -1,4 +1,4 @@
-import cli.config_cli
+import lambda_cron.cli.cli_config as cli_config
 import os
 import pytest
 
@@ -12,8 +12,8 @@ def invalid_config_file_path():
 
 
 def test_should_use_custom_for_environment(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    config = cli.config_cli.ConfigCli('prod')
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli_config.CliConfig('prod')
     assert config.bucket == 'test-bucket-custom'
     assert config.alarm_enabled
     assert config.alarm_email == 'my@email.com'
@@ -24,8 +24,8 @@ def test_should_use_custom_for_environment(monkeypatch):
 
 
 def test_should_use_for_all_environment(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    config = cli.config_cli.ConfigCli('other')
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli_config.CliConfig('other')
     assert config.bucket == 'test-bucket-all-other'
     assert not config.alarm_enabled
     assert config.alarm_email == ''
@@ -36,8 +36,8 @@ def test_should_use_for_all_environment(monkeypatch):
 
 
 def test_should_use_custom_and_all_environment_2(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    config = cli.config_cli.ConfigCli('staging')
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli_config.CliConfig('staging')
     assert config.bucket == 'test-bucket-all-staging'
     assert not config.alarm_enabled
     assert config.alarm_email == ''
@@ -48,8 +48,8 @@ def test_should_use_custom_and_all_environment_2(monkeypatch):
 
 
 def test_should_use_global_default_settings(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', invalid_config_file_path)
-    config = cli.config_cli.ConfigCli('test')
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', invalid_config_file_path)
+    config = cli_config.CliConfig('test')
     assert config.bucket == 'lambda-cron-test'
     assert not config.alarm_enabled
     assert config.alarm_email == ''
@@ -60,8 +60,8 @@ def test_should_use_global_default_settings(monkeypatch):
 
 
 def test_using_custom_settings(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    config = cli.config_cli.ConfigCli('develop')
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli_config.CliConfig('develop')
     assert config.bucket == 'test-bucket-all-develop'
     assert config.alarm_enabled
     assert config.alarm_email == 'develop@email.com'
@@ -72,34 +72,34 @@ def test_using_custom_settings(monkeypatch):
 
 
 def test_alarm_raise_exception_when_invalid_values_for_enabled(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     with pytest.raises(Exception) as exception_info:
-        cli.config_cli.ConfigCli('alarm_enabled_bad_value')
+        cli_config.CliConfig('alarm_enabled_bad_value')
     assert "Settings for 'alarm.enabled' must be a bool value" in str(exception_info.value)
 
 
 def test_alarm_raise_exception_when_alarm_enabled_and_no_email(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     with pytest.raises(Exception) as exception_info:
-        cli.config_cli.ConfigCli('alarm_enabled_no_email')
+        cli_config.CliConfig('alarm_enabled_no_email')
     assert "Email must be provided when alarm is enabled" in str(exception_info.value)
 
 
 def test_enabled_raise_exception_when_invalid_values(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     with pytest.raises(Exception) as exception_info:
-        cli.config_cli.ConfigCli('enabled_bad_value')
+        cli_config.CliConfig('enabled_bad_value')
     assert "Settings for 'enabled' must be a bool value" in str(exception_info.value)
 
 
 def test_frequency_raise_exeption_using_hours_and_minutes(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     with pytest.raises(Exception) as exception_info:
-        cli.config_cli.ConfigCli('frequency_error_only_one')
+        cli_config.CliConfig('frequency_error_only_one')
     assert "Only one of 'hours' or 'minutes' must be used for the frequency ('every'). Both are not allowed." in str(exception_info.value)
 
 
 def test_frequency_raise_with_float_value(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
-    config = cli.config_cli.ConfigCli('frequency_float')
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    config = cli_config.CliConfig('frequency_float')
     assert config.minutes == 5
