@@ -334,9 +334,7 @@ class CliTool:
                 all_yml_files = [os.path.join(dirpath, f)
                                  for dirpath, dirnames, files in os.walk(self.cli.task_directory)
                                  for f in files if f.endswith('.yml')]
-                print all_yml_files
                 for file_name in all_yml_files:
-                    print file_name
                     self.validate_task(schema, file_name)
         except jsonschema.exceptions.ValidationError, ex:
             print("Validation failed! Validation error in task: {}".format(ex.message))
