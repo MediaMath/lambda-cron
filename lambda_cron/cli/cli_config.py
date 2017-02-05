@@ -5,7 +5,7 @@ import yaml
 DEFAULT_BUCKET_PATTERN = 'lambda-cron-{environment}'
 
 
-def get_project_root_directory():
+def get_package_root_directory():
     return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../'))
 
 
@@ -14,7 +14,7 @@ def get_cli_config_file_path():
 
 
 def get_jsonschema_file_path():
-    return os.path.join(get_project_root_directory(), 'schema.json')
+    return os.path.join(get_package_root_directory(), 'schema.json')
 
 
 def load_config():
@@ -24,7 +24,7 @@ def load_config():
     return False
 
 
-class ConfigCli:
+class CliConfig:
 
     def __init__(self, environment):
         self.environment = environment

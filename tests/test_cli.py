@@ -1,5 +1,5 @@
-import cli.config_cli
-from cli.lambda_cron_cli import LambdaCronCLI
+import lambda_cron.cli.cli_config as cli_config
+from lambda_cron.cli.cli_tool import CliTool as LambdaCronCLI
 import os
 import pytest
 from mock import patch
@@ -38,7 +38,7 @@ class LambdaCronCLISpy(LambdaCronCLI):
 
 @patch.object(LambdaCronCLISpy, 'check_bucket')
 def test_create_command(check_bucket_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
@@ -68,7 +68,7 @@ def test_create_command(check_bucket_mock, monkeypatch):
 
 @patch.object(LambdaCronCLISpy, 'check_bucket')
 def test_add_profile_to_create_commands(check_bucket_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
@@ -87,7 +87,7 @@ def test_add_profile_to_create_commands(check_bucket_mock, monkeypatch):
 
 
 def test_update_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'prod'
@@ -116,7 +116,7 @@ def test_update_command(monkeypatch):
 
 
 def test_add_profile_to_update_commands(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'prod'
@@ -135,7 +135,7 @@ def test_add_profile_to_update_commands(monkeypatch):
 
 
 def test_delete_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
@@ -154,7 +154,7 @@ def test_delete_command(monkeypatch):
 
 
 def test_delete_command_with_delete_bucket(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
@@ -177,7 +177,7 @@ def test_delete_command_with_delete_bucket(monkeypatch):
 
 
 def test_add_profile_to_delete_commands(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'delete'
     cli_params.environment = 'prod'
@@ -195,7 +195,7 @@ def test_add_profile_to_delete_commands(monkeypatch):
 
 
 def test_invoke_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'invoke'
     cli_params.environment = 'prod'
@@ -212,7 +212,7 @@ def test_invoke_command(monkeypatch):
 
 
 def test_add_profile_to_invoke_commands(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'invoke'
     cli_params.environment = 'prod'
@@ -228,7 +228,7 @@ def test_add_profile_to_invoke_commands(monkeypatch):
 
 @patch.object(LambdaCronCLISpy, 'check_bucket')
 def test_lambda_function_config(check_bucket_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'prod'
@@ -250,7 +250,7 @@ def test_lambda_function_config(check_bucket_mock, monkeypatch):
 
 @patch.object(LambdaCronCLISpy, 'check_bucket')
 def test_lambda_function_config_II(check_bucket_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'create'
     cli_params.environment = 'other'
@@ -271,7 +271,7 @@ def test_lambda_function_config_II(check_bucket_mock, monkeypatch):
 
 
 def test_update_command_other_env(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'other'
@@ -300,7 +300,7 @@ def test_update_command_other_env(monkeypatch):
 
 
 def test_update_command_test_env(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'test'
@@ -329,7 +329,7 @@ def test_update_command_test_env(monkeypatch):
 
 
 def test_update_command_develop_env(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'update'
     cli_params.environment = 'develop'
@@ -358,7 +358,7 @@ def test_update_command_develop_env(monkeypatch):
 
 
 def test_start_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'start'
     cli_params.environment = 'prod'
@@ -384,7 +384,7 @@ def test_start_command(monkeypatch):
 
 
 def test_add_profile_to_start_commands(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'start'
     cli_params.environment = 'prod'
@@ -401,7 +401,7 @@ def test_add_profile_to_start_commands(monkeypatch):
 
 
 def test_stop_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'stop'
     cli_params.environment = 'prod'
@@ -427,7 +427,7 @@ def test_stop_command(monkeypatch):
 
 
 def test_add_profile_to_stop_commands(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'stop'
     cli_params.environment = 'prod'
@@ -445,7 +445,7 @@ def test_add_profile_to_stop_commands(monkeypatch):
 
 @patch.object(LambdaCronCLISpy, 'bucket_exists')
 def test_check_bucket_need_create_bucket(bucket_exists_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     bucket_exists_mock.return_value = False
     cli_params = Namespace()
     cli_params.command = 'create'
@@ -466,7 +466,7 @@ def test_check_bucket_need_create_bucket(bucket_exists_mock, monkeypatch):
 
 @patch.object(LambdaCronCLISpy, 'bucket_exists')
 def test_check_bucket_bucket_already_exists_error(bucket_exists_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     bucket_exists_mock.return_value = True
     cli_params = Namespace()
     cli_params.command = 'create'
@@ -483,7 +483,7 @@ def test_check_bucket_bucket_already_exists_error(bucket_exists_mock, monkeypatc
 
 @patch.object(LambdaCronCLISpy, 'bucket_exists')
 def test_check_bucket_bucket_already_exists_ok(bucket_exists_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     bucket_exists_mock.return_value = True
     cli_params = Namespace()
     cli_params.command = 'create'
@@ -499,7 +499,7 @@ def test_check_bucket_bucket_already_exists_ok(bucket_exists_mock, monkeypatch):
 
 @patch.object(LambdaCronCLISpy, 'bucket_exists')
 def test_check_bucket_bucket_does_not_exist_error(bucket_exists_mock, monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     bucket_exists_mock.return_value = False
     cli_params = Namespace()
     cli_params.command = 'create'
@@ -515,7 +515,7 @@ def test_check_bucket_bucket_does_not_exist_error(bucket_exists_mock, monkeypatc
 
 
 def test_upload_tasks_command(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'upload-tasks'
     cli_params.environment = 'prod'
@@ -534,7 +534,7 @@ def test_upload_tasks_command(monkeypatch):
 
 
 def test_validate_command_queue_task(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = get_test_task_path('valid/queue_task.yml')
@@ -545,7 +545,7 @@ def test_validate_command_queue_task(monkeypatch):
 
 
 def test_validate_command_http_get_task(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = get_test_task_path('valid/http_get_task.yml')
@@ -556,7 +556,7 @@ def test_validate_command_http_get_task(monkeypatch):
 
 
 def test_validate_command_http_post_task(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = get_test_task_path('valid/http_post_task.yml')
@@ -567,7 +567,7 @@ def test_validate_command_http_post_task(monkeypatch):
 
 
 def test_validate_command_lambda_task(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = get_test_task_path('valid/lambda_task.yml')
@@ -578,7 +578,7 @@ def test_validate_command_lambda_task(monkeypatch):
 
 
 def test_validate_command_with_error(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = get_test_task_path('invalid/invalid_task.yml')
@@ -593,7 +593,7 @@ def test_validate_command_with_error(monkeypatch):
 
 
 def test_validate_command_directory(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = None
@@ -604,7 +604,7 @@ def test_validate_command_directory(monkeypatch):
 
 
 def test_validate_command_directory_error(monkeypatch):
-    monkeypatch.setattr(cli.config_cli, 'get_cli_config_file_path', valid_cong_file_path)
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     cli_params = Namespace()
     cli_params.command = 'validate'
     cli_params.task_file = None

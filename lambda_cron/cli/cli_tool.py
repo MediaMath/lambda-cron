@@ -8,8 +8,8 @@ import os
 import time
 import datetime
 from zipfile import ZipFile
-from config_cli import ConfigCli
-import config_cli
+from cli_config import CliConfig
+import cli_config
 import yaml
 import json
 import jsonschema
@@ -57,12 +57,12 @@ def check_arg(args=None):
     return parser.parse_args(args)
 
 
-def get_lambda_cron_directory():
-    return os.path.abspath(os.path.join(config_cli.get_project_root_directory(), 'lambda_cron'))
+def get_aws_directory():
+    return os.path.abspath(os.path.join(cli_config.get_package_root_directory(), 'aws'))
 
 
 def get_lambda_cron_path(sub_path):
-    return os.path.join(get_lambda_cron_directory(), sub_path)
+    return os.path.join(get_aws_directory(), sub_path)
 
 
 def zip_dir(zip_file, path, prefix=''):
@@ -75,13 +75,13 @@ def zip_dir(zip_file, path, prefix=''):
             zip_file.write(absolute_path, relative_path)
 
 
-class LambdaCronCLI:
+class CliTool:
 
     def __init__(self, cli_instructions):
         self.cli = cli_instructions
         self.timestamp = int(round(time.time() * 1000))
         if self.is_config_required():
-            self.config = ConfigCli(self.cli.environment)
+            self.config = CliConfig(self.cli.environment)
 
     def is_config_required(self):
         return 'environment' in self.cli
@@ -106,7 +106,7 @@ class LambdaCronCLI:
 
     def install_dependencies(self):
         pip_install_command = ["pip", "install", "--requirement",
-                               os.path.join(config_cli.get_project_root_directory(), 'requirements.txt'),
+                               os.path.join(cli_config.get_package_root_directory(), 'requirements.txt'),
                                "--target", self.get_dependencies_directory(),
                                "--ignore-installed"]
         os.mkdir(self.get_dependencies_directory())
@@ -144,8 +144,8 @@ class LambdaCronCLI:
         self.generate_config()
         with ZipFile(self.get_code_zip_file_path(), 'w') as zip_file:
             zip_dir(zip_file, self.get_dependencies_directory())
-            zip_dir(zip_file, os.path.join(get_lambda_cron_directory(), 'lib'), 'lib')
-            zip_file.write(os.path.join(get_lambda_cron_directory(), 'main.py'), 'main.py')
+            zip_dir(zip_file, os.path.join(get_aws_directory(), 'lib'), 'lib')
+            zip_file.write(os.path.join(get_aws_directory(), 'main.py'), 'main.py')
             zip_file.write(self.get_config_file_path(), 'config.yml')
 
     def get_cron_expression(self):
@@ -216,7 +216,7 @@ class LambdaCronCLI:
     def create_stack(self):
         create_stack_command = [
             "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
-            "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
+            "--template-body", "file://{}".format(os.path.join(cli_config.get_package_root_directory(), 'template.cfn.yml')),
             "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
         create_stack_command = self.add_template_parameters(create_stack_command)
@@ -231,7 +231,7 @@ class LambdaCronCLI:
     def update_stack(self):
         update_stack_command = [
             "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
-            "--template-body", "file://{}".format(os.path.join(config_cli.get_project_root_directory(), 'template.cfn.yml')),
+            "--template-body", "file://{}".format(os.path.join(cli_config.get_package_root_directory(), 'template.cfn.yml')),
             "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
         update_stack_command = self.add_template_parameters(update_stack_command)
@@ -326,7 +326,7 @@ class LambdaCronCLI:
 
     def validate(self):
         try:
-            with open(config_cli.get_jsonschema_file_path(), 'r') as schema_file:
+            with open(cli_config.get_jsonschema_file_path(), 'r') as schema_file:
                 schema = json.load(schema_file)
 
             if self.cli.task_file:
@@ -363,4 +363,4 @@ class LambdaCronCLI:
 if __name__ == '__main__':
     results = check_arg(sys.argv[1:])
     print results
-    LambdaCronCLI(results).run()
+    CliTool(results).run()
