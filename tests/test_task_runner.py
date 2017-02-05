@@ -1,8 +1,8 @@
 import pytest
 import json
 from mock import patch
-from lambda_cron.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask
-from lambda_cron.lib.cron_checker import CronChecker
+from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask
+from lambda_cron.aws.lib.cron_checker import CronChecker
 
 
 @pytest.fixture(scope="module")
