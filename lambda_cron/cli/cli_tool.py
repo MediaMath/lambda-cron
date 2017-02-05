@@ -356,7 +356,7 @@ class CliTool:
         command_method()
 
 
-if __name__ == '__main__':
+def main():
     results = check_arg(sys.argv[1:])
     print results
     CliTool(results).run()
