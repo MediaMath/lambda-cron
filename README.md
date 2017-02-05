@@ -241,7 +241,7 @@ Parameters:
 ## Tasks
 
 Tasks are defined in YAML files, each task in an independent file. Task must follow
-the json schema provided in this repo: [schema](./schema.json).
+the json schema provided in this repo: [schema](./lambda_cron/schema.json).
 
 All tasks must contains following keys and values:
 
