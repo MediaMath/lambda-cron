@@ -408,6 +408,5 @@ Features/Improvements that would like to implement some time soon.
   * Manage/show logs
   * Check state
 * Create LambdaCron package to be installed with pip
-  * File with settings in ~/.lambda-cron
-  * Setting files can include other setting files.
+* Nested setting files
 * Add test for handler function
