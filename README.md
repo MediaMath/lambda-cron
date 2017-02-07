@@ -374,24 +374,24 @@ $ pip install -r requirements.txt
 Create your first environment (called 'test') with default settings:
 
 ``` bash
-$ bin/lambda-cron create --environment=test --create-bucket
+$ lambda-cron create --environment=test --create-bucket
 ```
 
 If you want to set some custom settings create the setting file in the home
 directory of the user is running the tool.
 
-* ~/lambdacron.yml
+* ~/lambda-cron.yml
 
 For help:
 
 ``` bash
-$ bin/lambda-cron --help
+$ lambda_cron/lambda-cron --help
 ```
 
 or for each command:
 
 ``` bash
-$ bin/lambda-cron create --help
+$ lambda_cron/lambda-cron create --help
 ```
 
 

@@ -10,7 +10,7 @@ def get_package_root_directory():
 
 
 def get_cli_config_file_path():
-    return os.path.expanduser('~/.lambdacron.yml')
+    return os.path.expanduser('~/.lambda-cron.yml')
 
 
 def get_jsonschema_file_path():
