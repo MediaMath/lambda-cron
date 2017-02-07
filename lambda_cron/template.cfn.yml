@@ -30,7 +30,7 @@ Parameters:
     Default: ''
 
 Conditions:
-  IsAlarmActive: !Equals [!Ref AlarmEnabled, True]
+  IsAlarmActive: !Equals [!Ref AlarmEnabled, 'True']
 
 Resources:
   LambdaCronFunction:
@@ -147,4 +147,7 @@ Outputs:
   LambdaCronRole:
     Value: !Ref LambdaCronRole
     Description: LambdaCronRole
+  LambdaAlarmActive:
+    Value: !Ref AlarmEnabled
+    Description: IsAlarmActive
 
