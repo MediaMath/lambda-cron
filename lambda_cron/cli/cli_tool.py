@@ -211,15 +211,18 @@ class CliTool:
             command.append("ParameterKey=AlarmPeriod,{}".format(self.get_parameter_value(self.get_alarm_period())))
         return command
 
-    def create_stack(self):
-        create_stack_command = [
-            "aws", "cloudformation", "create-stack", "--stack-name", self.get_stack_name(),
+    def get_aws_cloudformation_command(self, subcommand):
+        return [
+            "aws", "cloudformation", subcommand, "--stack-name", self.get_stack_name(),
             "--template-body", "file://{}".format(os.path.join(cli_config.get_package_root_directory(), 'template.cfn.yml')),
             "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
-        create_stack_command = self.add_template_parameters(create_stack_command)
 
+    def create_stack(self):
+        create_stack_command = self.get_aws_cloudformation_command('create-stack')
+        create_stack_command = self.add_template_parameters(create_stack_command)
         self.exec_aws_command(create_stack_command)
+
         wait_create_stack_command = [
             "aws", "cloudformation", "wait", "stack-create-complete",
             "--stack-name", self.get_stack_name()
@@ -227,13 +230,10 @@ class CliTool:
         self.exec_aws_command(wait_create_stack_command)
 
     def update_stack(self):
-        update_stack_command = [
-            "aws", "cloudformation", "update-stack", "--stack-name", self.get_stack_name(),
-            "--template-body", "file://{}".format(os.path.join(cli_config.get_package_root_directory(), 'template.cfn.yml')),
-            "--capabilities", "CAPABILITY_NAMED_IAM"
-        ]
+        update_stack_command = self.get_aws_cloudformation_command('update-stack')
         update_stack_command = self.add_template_parameters(update_stack_command)
         self.exec_aws_command(update_stack_command)
+
         wait_update_stack_command = [
             "aws", "cloudformation", "wait", "stack-update-complete",
             "--stack-name", self.get_stack_name()
