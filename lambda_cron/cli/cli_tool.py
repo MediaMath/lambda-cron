@@ -211,34 +211,28 @@ class CliTool:
             command.append("ParameterKey=AlarmPeriod,{}".format(self.get_parameter_value(self.get_alarm_period())))
         return command
 
-    def get_aws_cloudformation_command(self, subcommand):
-        return [
-            "aws", "cloudformation", subcommand, "--stack-name", self.get_stack_name(),
-            "--template-body", "file://{}".format(os.path.join(cli_config.get_package_root_directory(), 'template.cfn.yml')),
-            "--capabilities", "CAPABILITY_NAMED_IAM"
-        ]
-
-    def create_stack(self):
-        create_stack_command = self.get_aws_cloudformation_command('create-stack')
-        create_stack_command = self.add_template_parameters(create_stack_command)
-        self.exec_aws_command(create_stack_command)
-
+    def run_aws_cloudformation_wait_command(self, action):
         wait_create_stack_command = [
-            "aws", "cloudformation", "wait", "stack-create-complete",
+            "aws", "cloudformation", "wait", "stack-{}-complete".format(action),
             "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(wait_create_stack_command)
 
-    def update_stack(self):
-        update_stack_command = self.get_aws_cloudformation_command('update-stack')
-        update_stack_command = self.add_template_parameters(update_stack_command)
-        self.exec_aws_command(update_stack_command)
-
-        wait_update_stack_command = [
-            "aws", "cloudformation", "wait", "stack-update-complete",
-            "--stack-name", self.get_stack_name()
+    def run_aws_cloudformation_command(self, action):
+        create_stack_command = [
+            "aws", "cloudformation", "{}-stack".format(action), "--stack-name", self.get_stack_name(),
+            "--template-body", "file://{}".format(os.path.join(cli_config.get_package_root_directory(), 'template.cfn.yml')),
+            "--capabilities", "CAPABILITY_NAMED_IAM"
         ]
-        self.exec_aws_command(wait_update_stack_command)
+        create_stack_command = self.add_template_parameters(create_stack_command)
+        self.exec_aws_command(create_stack_command)
+        self.run_aws_cloudformation_wait_command(action)
+
+    def create_stack(self):
+        self.run_aws_cloudformation_command('create')
+
+    def update_stack(self):
+        self.run_aws_cloudformation_command('update')
 
     def bucket_exists(self):
         check_bucket_command = ["aws", "s3api", "head-bucket", "--bucket", self.config.bucket]
