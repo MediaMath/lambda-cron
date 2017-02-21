@@ -147,16 +147,20 @@ class CliTool:
             zip_file.write(self.get_config_file_path(), 'config.yml')
 
     def get_cron_expression(self):
+        minutes = hours = '*'
         if self.config.minutes:
+            hours = '*'
             if self.config.minutes == 1:
-                return 'cron(* * * * ? *)'
+                minutes = '*'
             else:
-                return "cron(*/{} * * * ? *)".format(self.config.minutes)
+                minutes = "*/{}".format(self.config.minutes)
         elif self.config.hours:
+            minutes = '0'
             if self.config.hours == 1:
-                return 'cron(0 * * * ? *)'
+                hours = '*'
             else:
-                return "cron(0 */{} * * ? *)".format(self.config.hours)
+                hours = '*/{}'.format(self.config.hours)
+        return "cron({minutes} {hours} * * ? *)".format(minutes=minutes, hours=hours)
 
     def get_alarm_period(self):
         if self.config.minutes:
@@ -277,12 +281,7 @@ class CliTool:
             "--stack-name", self.get_stack_name()
         ]
         self.exec_aws_command(delete_stack_command)
-
-        wait_update_stack_command = [
-            "aws", "cloudformation", "wait", "stack-delete-complete",
-            "--stack-name", self.get_stack_name()
-        ]
-        self.exec_aws_command(wait_update_stack_command)
+        self.run_aws_cloudformation_wait_command('delete')
 
         if self.cli.delete_bucket:
             delete_bucket_command = ["aws", "s3api", "delete-bucket", "--bucket", self.config.bucket]
