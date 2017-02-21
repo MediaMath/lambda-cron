@@ -73,6 +73,12 @@ def zip_dir(zip_file, path, prefix=''):
             zip_file.write(absolute_path, relative_path)
 
 
+def get_cron_unit_expression(value):
+    if value == 1:
+        return '*'
+    else:
+        return "*/{}".format(value)
+
 class CliTool:
 
     def __init__(self, cli_instructions):
@@ -150,16 +156,10 @@ class CliTool:
         minutes = hours = '*'
         if self.config.minutes:
             hours = '*'
-            if self.config.minutes == 1:
-                minutes = '*'
-            else:
-                minutes = "*/{}".format(self.config.minutes)
+            minutes = get_cron_unit_expression(self.config.minutes)
         elif self.config.hours:
             minutes = '0'
-            if self.config.hours == 1:
-                hours = '*'
-            else:
-                hours = '*/{}'.format(self.config.hours)
+            hours = get_cron_unit_expression(self.config.hours)
         return "cron({minutes} {hours} * * ? *)".format(minutes=minutes, hours=hours)
 
     def get_alarm_period(self):
