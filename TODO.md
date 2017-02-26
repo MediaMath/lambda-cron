@@ -11,7 +11,7 @@ the task. Be able to disable tasks in the task definition could be useful.
 Proposals:
 
 1. Add new attribute in task definition to indicate if the task is enabled or disabled:
-    * enabaled: [True|False] (True by default)
+    * enabaled: \[True|False\] (True by default)
     
 1. Replace cron expression with a keyword, ie. disabled
     
