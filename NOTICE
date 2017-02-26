@@ -1,0 +1,51 @@
+LambdaCron
+Copyright 2016 MediaMath
+
+This project contains 3rd party dependencies (PyPi packages):
+
+    cronitier
+    https://pypi.python.org/pypi/croniter
+    MIT License
+
+    PyYaml
+    https://pypi.python.org/pypi/PyYAML
+    MIT License
+
+    Requests
+    https://pypi.python.org/pypi/requests
+    Apache License 2.0
+
+    Jsonschema
+    https://pypi.python.org/pypi/jsonschema
+    MIT License
+
+    boto3
+    https://pypi.python.org/pypi/boto3
+    Apache License 2.0
+
+Development dependencies:
+
+    pytest
+    https://pypi.python.org/pypi/pytest
+    MIT License
+
+    Mock
+    https://pypi.python.org/pypi/mock
+    BSD License
+
+
+
+
+
+
+
+
+his code depends on the following 3rd party libraries, all of them licensed under MIT or Apache 2.0 License.
+cronitier – MIT: https://pypi.python.org/pypi/croniter
+PyYaml – MIT: https://pypi.python.org/pypi/PyYAML
+Requests – Apache 2.0: https://pypi.python.org/pypi/requests
+Jsonschema – MIT:  https://pypi.python.org/pypi/jsonschema
+Development dependencies:
+pytest – MIT: https://pypi.python.org/pypi/pytest
+boto3 – Apache 2.0: https://pypi.python.org/pypi/boto3
+Mock – BSD License: https://pypi.python.org/pypi/mock
