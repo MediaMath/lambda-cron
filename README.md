@@ -395,18 +395,10 @@ $ lambda_cron/lambda-cron create --help
 ```
 
 
-## TODO
+## TODO & CONTRIBUTING
 
-Features/Improvements that would like to implement some time soon.
+In [TODO](./TODO.md) there are a list of features/improvements that
+would be good to have in **LambdaCron**.
 
-* Be able to disable tasks
-* Index file to know which tasks must runs and avoid read all of them
-* Support all parameters for [boto3 SQS.Queue.send_message](http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.send_message)
-* Support all HTTP methods in [Requests](http://docs.python-requests.org/en/master/)
-* Improve CLI output.
-* Add new commands:
-  * Manage/show logs
-  * Check state
-* Create LambdaCron package to be installed with pip
-* Nested setting files
-* Add test for handler function
+Before contribute we encourage to take a look of following 
+[tips provided by GitHub](https://guides.github.com/activities/contributing-to-open-source/)
