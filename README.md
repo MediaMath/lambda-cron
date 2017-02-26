@@ -377,10 +377,10 @@ Create your first environment (called 'test') with default settings:
 $ lambda-cron create --environment=test --create-bucket
 ```
 
-If you want to set some custom settings create the setting file in the home
-directory of the user is running the tool.
+If you want to set some custom settings, create the setting file in the home
+directory of the user who is running the tool.
 
-* ~/lambda-cron.yml
+* ~/.lambda-cron.yml
 
 For help:
 
