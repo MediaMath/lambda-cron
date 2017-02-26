@@ -27,6 +27,9 @@ as desired can be set up.
 
 ### Settings
 
+Custom settings from environments are set in a YAML file in user home and
+called **~/.lambda-cron.yml**.
+
 There are 3 levels of preferences for settings:
 
 * Environment: Custom values for an specific environment.
