@@ -9,6 +9,7 @@ Currently the only way to disable tasks is to remove the file that define
 the task. Be able to disable tasks in the task definition could be useful.
 
 Proposals:
+
 1. Add new attribute in task definition to indicate if the task is enabled or disabled:
     * enabaled: [True|False] (True by default)
     
@@ -20,6 +21,7 @@ evaluate the cron expression for each of them. While the number of task grows
 performance can be affected negatively. 
 
 Proposal:
+
 1. When uploading the tasks create a file indexing tasks files by cron expression.
 In this way the AWS Lambda function will read the index file, evaluate different cron
 expressions only once and will read only the files with the tasks that must be executed.
@@ -39,6 +41,7 @@ to send to the queue. It doesn't allow the possibility to use all options provid
 by the library.
 
 Proposal:
+
 1. Update task runner to handle all or most useful options provided by boto3
 to send a message to a SQS queue.
 
@@ -46,6 +49,7 @@ to send a message to a SQS queue.
 The current version of **LambdaCron** only allow to send **GET** and **POST** requests.
 
 Proposal:
+
 1. Update task runner to handle all (of most of them) HTTP methods available in
 [Requests](http://docs.python-requests.org/en/master/)
 
@@ -54,6 +58,7 @@ The CLI output shows the output/results of the commands executed to do the job. 
 is not user friendly.
 
 Proposal:
+
 1. Hide output from the commands executed by the tool and show meaningful output
 for the user:
     * Summary of the task running (environment and options)
@@ -65,6 +70,7 @@ Currently **LambdaCron** allows to set environment options in one file
 in different files (different projects).
 
 Proposal:
+
 1. Be able to include setting files in *~/.lambda-cron.yml*. For example:
 
 ```yaml
@@ -80,5 +86,6 @@ with the tool in the command line (as it would be crontab) without having
 to access to AWS console.
 
 Proposals:
+
 1. Manage/show logs from CloudWatch in the terminal.
 1. Check status of the project in the terminal: enabled/disabled, number of tasks, ...
