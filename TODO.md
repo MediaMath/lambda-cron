@@ -1,7 +1,7 @@
 
 # TODO - LambdaCron
 
-This files content a set of features and/or improvements that would be
+This files describes a set of features and/or improvements that would be
 good to have in **LambdaCron**
 
 ### Disable task
