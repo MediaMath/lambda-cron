@@ -359,17 +359,13 @@ run at minute 00. LambdaCron will run again next hour.
 
 ## Getting Started
 
-Clone this repo
+### Install
 
 ``` bash
-$ git clone https://github.com/mediamath/lambda-cron.git
+$ pip install lambda-cron
 ```
 
-Install dependencies (you can use a virtualenv):
-
-``` bash
-$ pip install -r requirements.txt
-```
+### Usage 
 
 Create your first environment (called 'test') with default settings:
 
@@ -385,13 +381,13 @@ directory of the user who is running the tool.
 For help:
 
 ``` bash
-$ lambda_cron/lambda-cron --help
+$ lambda-cron --help
 ```
 
 or for each command:
 
 ``` bash
-$ lambda_cron/lambda-cron create --help
+$ lambda-cron create --help
 ```
 
 
