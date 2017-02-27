@@ -396,7 +396,7 @@ $ lambda-cron create --help
 
 ## TODO & CONTRIBUTING
 
-In [TODO](./TODO.md) there are a list of features/improvements that
+In [TODO](./TODO.md) there is a list of features/improvements that
 would be good to have in **LambdaCron**.
 
 Before contribute we encourage to take a look of following 
