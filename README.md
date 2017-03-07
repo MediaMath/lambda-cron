@@ -146,7 +146,7 @@ The settings for each environment will be:
   * every:
     * minutes: 5
 
-* staging:
+* dev:
   * enabled: False
   * bucket: my-project-cron-dev
   * alarm:
