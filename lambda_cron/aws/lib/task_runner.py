@@ -42,6 +42,9 @@ class TaskRunner:
     def get_http_task_runner(self, task):
         return HttpTask(task)
 
+    def get_batch_task_runner(self, task):
+        return BatchJobTask(task)
+
 
 class Task:
 
@@ -84,3 +87,13 @@ class InvokeLambdaTask(Task):
             FunctionName=self.task['FunctionName'],
             InvokeArgs=json.dumps(self.task['InvokeArgs'])
         )
+
+
+class BatchJobTask(Task):
+
+    def get_batch_client(self):
+        return boto3.client('batch')
+
+    def run(self):
+        self.task.pop('type')
+        self.get_batch_client().submit_job(**self.task)

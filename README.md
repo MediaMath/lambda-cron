@@ -13,6 +13,7 @@ Tasks are scheduled using the same syntax for expressions as linux
 
 * **Queue task**: send message to AWS SQS queue.
 * **Lambda task**: invoke AWS lambda function.
+* **Batch task**: submit AWS Batch job.
 * **HTTP task**: send HTTP requests (GET & POST).
 
 Tasks are defined in YAML files and are stored in a S3 bucket.
@@ -283,7 +284,7 @@ All parameters of the function will be supported soon.
 ### Lambda task
 
 It invokes an AWS lambda functions.
-The task definition must contains following keys
+The task definition must contains following keys:
 
 * **type**: *lambda*
 * **FunctionName**: Name of the lambda function to invoke (string)
@@ -301,6 +302,29 @@ task:
 ```
 
 Function is invoked using [boto3 Lambda.Client.invoke_async](http://boto3.readthedocs.io/en/latest/reference/services/lambda.html#Lambda.Client.invoke_async)
+
+### Batch task
+
+It submits AWS Batch Jobs.
+The task definition must contains following keys:
+
+* **type**: *batch*
+* **jobName**: name to assign to the job (string)
+* **jobQueue**: name of the queue in AWS Batch (string)
+* **jobDefinition**: name of the job definition in AWS Batch (string)
+
+``` yaml
+name: 'Enrich new stats every hour'
+expression: '0 * * * *'
+task:
+  type: 'bath'
+  jobName: 'enrich-stats'
+  jobDefinition: 'enrich-stats-definition:1'
+  jobQueue: 'jobs_high_priority'
+```
+
+It is a wrapper for [boto3 Batch.Client.submit_job](http://boto3.readthedocs.io/en/latest/reference/services/batch.html#Batch.Client.submit_job).
+It means all parameters for the method can be set in the task definition.
 
 ### HTTP task
 

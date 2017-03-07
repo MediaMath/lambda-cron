@@ -15,7 +15,7 @@
 import pytest
 import json
 from mock import patch
-from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask
+from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask, BatchJobTask
 from lambda_cron.aws.lib.cron_checker import CronChecker
 
 
@@ -323,3 +323,57 @@ def test_http_not_supported_method(get_requests_client_mock, http_client_spy, cr
     with pytest.raises(Exception) as exception_info:
         task_runner.run(http_get_task_definition)
     assert "Http method not supported: put" in str(exception_info.value)
+
+
+class BatchClientSpy:
+    def __init__(self):
+        self.parameters = None
+        self.calls = 0
+
+    def submit_job(self, **kwargs):
+        self.parameters = kwargs
+        self.calls += 1
+
+
+@pytest.fixture(scope="function")
+def batch_client_spy():
+    return BatchClientSpy()
+
+
+BATCH_TASK_BODY =\
+    {
+        'type': 'batch',
+        'jobName': 'testing-batch-job',
+        'jobQueue': 'testing-batch-job-queue',
+        'jobDefinition': 'testing-batch-job-definition',
+        'parameters':
+            {
+                'param_1': 'value_1',
+                'param_2': 'value_2'
+            }
+    }
+
+
+@pytest.fixture(scope="function")
+def batch_task_definition():
+    return {
+        'name': 'Test task',
+        'expression': '0 11 * * *',
+        'task': dict(BATCH_TASK_BODY)
+    }
+
+
+@patch.object(BatchJobTask, 'get_batch_client')
+def test_batch_should_run_basic(get_batch_client_mock, batch_client_spy, cron_checker, batch_task_definition):
+    get_batch_client_mock.return_value = batch_client_spy
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(batch_task_definition)
+
+    assert batch_client_spy.calls == 1
+    assert 'jobName' in batch_client_spy.parameters
+    assert batch_client_spy.parameters['jobName'] == 'testing-batch-job'
+    assert 'jobQueue' in batch_client_spy.parameters
+    assert batch_client_spy.parameters['jobQueue'] == 'testing-batch-job-queue'
+    assert 'parameters' in batch_client_spy.parameters
+    assert batch_client_spy.parameters['parameters'] == BATCH_TASK_BODY['parameters']

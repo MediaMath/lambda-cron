@@ -1,0 +1,10 @@
+name: 'test batch task'
+expression: '0 11 * * *'
+task:
+  type: 'batch'
+  jobName: 'my-batch-job'
+  jobQueue: 'job-queue-hihg-priority'
+  jobDefinition: 'my-batch-job-definition'
+  parameters:
+    argument_1: 'value_argument_1'
+    argument_2: 2

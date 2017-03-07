@@ -87,6 +87,10 @@ Resources:
             Action:
               - lambda:InvokeFunction
             Resource: ['*']
+          - Effect: Allow
+            Action:
+              - batch:SubmitJob
+            Resource: ['*']
 
   LambdaCronHourlyEvent:
     Type: AWS::Events::Rule

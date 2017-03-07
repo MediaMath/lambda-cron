@@ -30,6 +30,18 @@
         },
         {
           "properties": {
+            "type": { "type": "string", "enum": ["batch"] },
+            "jobName": { "type": "string" },
+            "jobQueue": { "type": "string" },
+            "jobDefinition": { "type": "string" },
+            "dependsOn": { "type": "array" },
+            "parameters": { "type": "object" },
+            "containerOverrides": { "type": "object" }
+          },
+          "required": ["type", "jobName", "jobQueue", "jobDefinition"]
+        },
+        {
+          "properties": {
             "type": { "type": "string", "enum": ["http"] },
             "method": { "type": "string", "enum": ["GET", "get", "Get", "POST", "post", "Post"]},
             "request": { "type": "object" }
