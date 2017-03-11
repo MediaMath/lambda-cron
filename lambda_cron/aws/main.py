@@ -23,7 +23,6 @@ from lib.task_runner import TaskRunner
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-QUEUE_PATTERN = "preakness-{}"
 TASKS_PREFIX = 'tasks/'
 
 
@@ -55,6 +54,6 @@ def handler(event, _):
             task_definition = yaml.load(obj.get()['Body'].read())
             logger.info("Running task: {}".format(task_definition['name']))
             task_runner.run(task_definition)
-        except Exception, exc:
+        except:
             logger.error("!! Error processing task: {}".format(obj.key))
             traceback.print_exc()
