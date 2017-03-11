@@ -117,3 +117,10 @@ def test_frequency_raise_with_float_value(monkeypatch):
     monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
     config = cli_config.CliConfig('frequency_float')
     assert config.minutes == 5
+
+
+def test_frequency_raise_exeption_invalid_time_key(monkeypatch):
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    with pytest.raises(Exception) as exception_info:
+        cli_config.CliConfig('frequency_invalid_time_key')
+    assert "Invalid time key used for frequency ('every'). Allowed keys: 'hours' or 'minutes'" in str(exception_info.value)

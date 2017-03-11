@@ -58,12 +58,22 @@ class CliConfig:
     def is_environment_in_config_file(self):
         return self.config and (self.environment in self.config)
 
+    def is_custom_options(self, option):
+        return self.is_environment_in_config_file() and (option in self.config[self.environment])
+
+    def is_global_option(self, option):
+        return self.config and ('all' in self.config) and (option in self.config['all'])
+
+    def get_config_option(self, option):
+        option_value = None
+        if self.is_custom_options(option):
+            option_value = self.config[self.environment][option]
+        elif self.is_global_option(option):
+            option_value = self.config['all'][option]
+        return option_value
+
     def set_alarm(self):
-        alarm_config = None
-        if self.is_environment_in_config_file() and ('alarm' in self.config[self.environment]):
-            alarm_config = self.config[self.environment]['alarm']
-        elif self.config and ('all' in self.config) and ('alarm' in self.config['all']):
-            alarm_config = self.config['all']['alarm']
+        alarm_config = self.get_config_option('alarm')
 
         if not alarm_config:
             return
@@ -77,39 +87,44 @@ class CliConfig:
             self.alarm_email = alarm_config['email']
 
     def set_bucket(self):
-        if self.is_environment_in_config_file() and ('bucket' in self.config[self.environment]):
+        if self.is_custom_options('bucket'):
             self.bucket = self.config[self.environment]['bucket']
-        elif self.config and ('all' in self.config) and ('bucket' in self.config['all']):
+        elif self.is_global_option('bucket'):
             if '{environment}' in self.config['all']['bucket']:
                 self.bucket = self.config['all']['bucket'].format(environment=self.environment)
             else:
                 self.bucket = self.config['all']['bucket'] + "-{}".format(self.environment)
 
-    def set_frequency(self):
-        config_every = None
-        if self.is_environment_in_config_file() and ('every' in self.config[self.environment]):
-            config_every = self.config[self.environment]['every']
-        elif self.config and ('all' in self.config) and ('every' in self.config['all']):
-            config_every = self.config['all']['every']
+    def get_time_key_value(self, config_every):
+        time_key = None
+        if 'hours' in config_every:
+            time_key = 'hours'
 
+        if 'minutes' in config_every:
+            if time_key is not None:
+                raise Exception("Only one of 'hours' or 'minutes' must be used for the frequency ('every'). Both are not allowed.")
+            time_key = 'minutes'
+
+        if time_key is None:
+            raise Exception("Invalid time key used for frequency ('every'). Allowed keys: 'hours' or 'minutes'")
+
+        return time_key, int(config_every[time_key])
+
+    def set_frequency(self):
+        config_every = self.get_config_option('every')
         if not config_every:
             return
 
-        if ('hours' in config_every) and ('minutes' in config_every):
-            raise Exception("Only one of 'hours' or 'minutes' must be used for the frequency ('every'). Both are not allowed.")
-
-        if 'hours' in config_every:
-            self.hours = int(config_every['hours'])
-            self.minutes = False
-        if 'minutes' in config_every:
-            self.minutes = int(config_every['minutes'])
-            self.hours = False
+        time_key, time_value = self.get_time_key_value(config_every)
+        self.hours = False
+        self.minutes = False
+        setattr(self, time_key, time_value)
 
     def set_enabled(self):
-        if self.is_environment_in_config_file() and ('enabled' in self.config[self.environment]):
-            self.enabled = self.config[self.environment]['enabled']
-        elif self.config and ('all' in self.config) and ('enabled' in self.config['all']):
-            self.enabled = self.config['all']['enabled']
+        enabled_default_value = self.enabled
+        self.enabled = self.get_config_option('enabled')
+        if self.enabled is None:
+            self.enabled = enabled_default_value
 
         if not isinstance(self.enabled, bool):
             raise Exception("Settings for 'enabled' must be a bool value")

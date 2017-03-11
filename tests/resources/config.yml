@@ -50,3 +50,7 @@ frequency_error_only_one:
 frequency_float:
   every:
     minutes: 5.2
+
+frequency_invalid_time_key:
+  every:
+    no_valid_field: 5
