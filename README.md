@@ -350,17 +350,6 @@ task:
 It is a wrapper over [Requests](http://docs.python-requests.org/en/master/).
 All http methods will be supported soon.
 
-
-## Requirements
-
-* Python 2.7
-* boto3
-* pip
-* AWS account
-* awscli (configured)
-
-**LambdaCron** is based 100% on AWS cloud.
-
 ## Frequency
 
 #### Execution time 
@@ -383,7 +372,19 @@ You can read in following [documentation](http://docs.aws.amazon.com/AmazonCloud
 
 Be aware of this.
 
+# Requirements
+
+* Python 2.7
+* boto3
+* pip
+* AWS account
+* awscli (configured)
+
+**LambdaCron** is based 100% on AWS cloud.
+
 ## Getting Started
+
+**Important!** The tool is not available in **pip** yet. If you want to try it, check [Development](#development)
 
 ### Install
 
@@ -416,11 +417,24 @@ or for each command:
 $ lambda-cron create --help
 ```
 
+## Development
 
-## TODO & CONTRIBUTING
+To start working with **LambdaCron** you should clone the project, create a 
+virtualenv (optional) and install dependencies:
 
-In [TODO](./TODO.md) there is a list of features/improvements that
-would be good to have in **LambdaCron**.
+``` bash
+$ git clone https://github.com/MediaMath/lambda-cron.git
+$ cd lambda-cron
+$ virtualenv venv
+$ source venv/bin/activate
+$ pip install -r requirements-dev.txt
+$ ./lambda_cron/lambda-cron --help
+```
+
+## Contributing
+
+Contributions are welcome. You can find open issues with some features and 
+improvements that would be good to have in **LambdaCron**.
 
 Before contribute we encourage to take a look of following 
 [tips provided by GitHub](https://guides.github.com/activities/contributing-to-open-source/)
