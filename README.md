@@ -363,9 +363,17 @@ All http methods will be supported soon.
 
 ## Frequency
 
-When setting up the frequency of **LambdaCron** you must have into account following things.
+#### Execution time 
+All tasks scheduled to run between the current event and the next event will be run immediately.
 
-####  Higher frequency is 1 minute
+Example: LambdaCron runs every hour ('0 * * * *'), tasks '0 1 * * *' and '58 1 * * *' will run at the same time.
+
+####  Task frequency  
+Lambda cron will execute a task at most once invocation.  This can result in a task being run fewer times than it's cron expression implies.
+
+Example: If LambdaCron runs every hour ('0 * * * *'), a task '*/15 * * * *' will only run once an hour.  If LambdaCron runs every minute ('* * * * *'), a task '*/15 * * * *' will only run four times an hour.
+
+####  Frequecy and Precision
 
 Events are based on [AWS CloudWatch Events](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html).
 You can read in following [documentation](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html):
@@ -374,15 +382,6 @@ You can read in following [documentation](http://docs.aws.amazon.com/AmazonCloud
 * "Your scheduled rule is triggered within that minute, but not on the precise 0th second"
 
 Be aware of this.
-
-####  Higher frequency for a task is LambdaCron frequency.
-
-It means that if LambdaCron run every hour and the task expression is set for every 15 min. the task
-will run once an hour. When LambdaCron runs it will executed all tasks scheduled for the period of
-time until next execution.
-
-For example, if LambdaCron runs every hour (at mininute 00) and there is a task scheduled for minute 30, it will
-run at minute 00. LambdaCron will run again next hour.
 
 ## Getting Started
 
