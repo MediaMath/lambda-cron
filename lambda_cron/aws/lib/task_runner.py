@@ -16,6 +16,7 @@ import json
 import boto3
 import logging
 import requests
+import dateutil.parser
 
 
 logger = logging.getLogger()
@@ -44,6 +45,9 @@ class TaskRunner:
 
     def get_batch_task_runner(self, task):
         return BatchJobTask(task)
+
+    def get_datapipeline_task_runner(self, task):
+        return DataPipelineJobTask(task)
 
 
 class Task:
@@ -97,3 +101,15 @@ class BatchJobTask(Task):
     def run(self):
         self.task.pop('type')
         self.get_batch_client().submit_job(**self.task)
+
+
+class DataPipelineJobTask(Task):
+
+    def get_datapipeline_client(self):
+        return boto3.client('datapipeline')
+
+    def run(self):
+        self.task.pop('type')
+        if 'startTimestamp' in self.task:
+            self.task['startTimestamp'] = dateutil.parser.parse(self.task['startTimestamp'])
+        self.get_datapipeline_client().activate_pipeline(**self.task)

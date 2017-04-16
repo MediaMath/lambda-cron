@@ -14,8 +14,10 @@
 
 import pytest
 import json
+import datetime
+import pytz
 from mock import patch
-from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask, BatchJobTask
+from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask, BatchJobTask, DataPipelineJobTask
 from lambda_cron.aws.lib.cron_checker import CronChecker
 
 
@@ -377,3 +379,72 @@ def test_batch_should_run_basic(get_batch_client_mock, batch_client_spy, cron_ch
     assert batch_client_spy.parameters['jobQueue'] == 'testing-batch-job-queue'
     assert 'parameters' in batch_client_spy.parameters
     assert batch_client_spy.parameters['parameters'] == BATCH_TASK_BODY['parameters']
+
+
+class DataPipelineClientSpy:
+    def __init__(self):
+        self.parameters = None
+        self.calls = 0
+
+    def activate_pipeline(self, **kwargs):
+        self.parameters = kwargs
+        self.calls += 1
+
+@pytest.fixture(scope="function")
+def datapipeline_client_spy():
+    return DataPipelineClientSpy()
+
+
+DATAPIPELINE_TASK_BODY =\
+    {
+        'type': 'datapipeline',
+        'pipelineId': 'testing-pipeline-Id',
+        'parameterValues':
+            {
+                'param_1': 'value_1',
+                'param_2': 'value_2'
+            },
+        'startTimestamp': '2017-04-25T09:00:00Z',
+    }
+
+
+@pytest.fixture(scope="function")
+def datapipeline_task_definition():
+    return {
+        'name': 'Test task',
+        'expression': '0 11 * * *',
+        'task': dict(DATAPIPELINE_TASK_BODY)
+    }
+
+
+@patch.object(DataPipelineJobTask, 'get_datapipeline_client')
+def test_datapipeline_should_run_basic(get_datapipeline_client_mock, datapipeline_client_spy, cron_checker, datapipeline_task_definition):
+    get_datapipeline_client_mock.return_value = datapipeline_client_spy
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(datapipeline_task_definition)
+
+    assert datapipeline_client_spy.calls == 1
+    assert 'pipelineId' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['pipelineId'] == 'testing-pipeline-Id'
+    assert 'parameterValues' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['parameterValues'] == DATAPIPELINE_TASK_BODY['parameterValues']
+    assert 'startTimestamp' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['startTimestamp'] == datetime.datetime(2017, 4, 25, 9, 0, 0, tzinfo=pytz.utc)
+
+
+
+@patch.object(DataPipelineJobTask, 'get_datapipeline_client')
+def test_datapipeline_should_run_no_time(get_datapipeline_client_mock, datapipeline_client_spy, cron_checker, datapipeline_task_definition):
+    get_datapipeline_client_mock.return_value = datapipeline_client_spy
+    datapipeline_task_definition['task'].pop('startTimestamp', None)
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(datapipeline_task_definition)
+
+    assert datapipeline_client_spy.calls == 1
+    assert 'pipelineId' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['pipelineId'] == 'testing-pipeline-Id'
+    assert 'parameterValues' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['parameterValues'] == DATAPIPELINE_TASK_BODY['parameterValues']
+    assert 'startTimestamp' not in datapipeline_client_spy.parameters
