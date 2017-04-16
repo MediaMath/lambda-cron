@@ -91,6 +91,10 @@ Resources:
             Action:
               - batch:SubmitJob
             Resource: ['*']
+          - Effect: Allow
+            Action:
+              - datapipeline:ActivatePipeline
+            Resource: ['*']
 
   LambdaCronHourlyEvent:
     Type: AWS::Events::Rule
