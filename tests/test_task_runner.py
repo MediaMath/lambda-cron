@@ -420,6 +420,22 @@ def datapipeline_task_definition():
 @patch.object(DataPipelineJobTask, 'get_datapipeline_client')
 def test_datapipeline_should_run_basic(get_datapipeline_client_mock, datapipeline_client_spy, cron_checker, datapipeline_task_definition):
     get_datapipeline_client_mock.return_value = datapipeline_client_spy
+    datapipeline_task_definition['task'].pop('startTimestamp', None)
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(datapipeline_task_definition)
+
+    assert datapipeline_client_spy.calls == 1
+    assert 'pipelineId' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['pipelineId'] == 'testing-pipeline-Id'
+    assert 'parameterValues' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['parameterValues'] == DATAPIPELINE_TASK_BODY['parameterValues']
+    assert 'startTimestamp' not in datapipeline_client_spy.parameters
+
+
+@patch.object(DataPipelineJobTask, 'get_datapipeline_client')
+def test_datapipeline_should_run_start_time_iso8601(get_datapipeline_client_mock, datapipeline_client_spy, cron_checker, datapipeline_task_definition):
+    get_datapipeline_client_mock.return_value = datapipeline_client_spy
 
     task_runner = TaskRunner(cron_checker)
     task_runner.run(datapipeline_task_definition)
@@ -433,11 +449,10 @@ def test_datapipeline_should_run_basic(get_datapipeline_client_mock, datapipelin
     assert datapipeline_client_spy.parameters['startTimestamp'] == datetime.datetime(2017, 4, 25, 9, 0, 0, tzinfo=pytz.utc)
 
 
-
 @patch.object(DataPipelineJobTask, 'get_datapipeline_client')
-def test_datapipeline_should_run_no_time(get_datapipeline_client_mock, datapipeline_client_spy, cron_checker, datapipeline_task_definition):
+def test_datapipeline_should_run_start_time_no_iso8601(get_datapipeline_client_mock, datapipeline_client_spy, cron_checker, datapipeline_task_definition):
     get_datapipeline_client_mock.return_value = datapipeline_client_spy
-    datapipeline_task_definition['task'].pop('startTimestamp', None)
+    datapipeline_task_definition['task']['startTimestamp'] = '2017-04-25 09:00:00'
 
     task_runner = TaskRunner(cron_checker)
     task_runner.run(datapipeline_task_definition)
@@ -447,4 +462,5 @@ def test_datapipeline_should_run_no_time(get_datapipeline_client_mock, datapipel
     assert datapipeline_client_spy.parameters['pipelineId'] == 'testing-pipeline-Id'
     assert 'parameterValues' in datapipeline_client_spy.parameters
     assert datapipeline_client_spy.parameters['parameterValues'] == DATAPIPELINE_TASK_BODY['parameterValues']
-    assert 'startTimestamp' not in datapipeline_client_spy.parameters
+    assert 'startTimestamp' in datapipeline_client_spy.parameters
+    assert datapipeline_client_spy.parameters['startTimestamp'] == datetime.datetime(2017, 4, 25, 9, 0, 0)
