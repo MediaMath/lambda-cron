@@ -257,6 +257,9 @@ class CliTool:
         command_result = self.exec_aws_command(check_bucket_command)
         return command_result == 0
 
+    def get_s3_bucket_uri(self):
+        return "s3://{bucket_name}".format(bucket_name=self.config.bucket)
+
     def check_bucket(self):
         bucket_exists = self.bucket_exists()
         if self.cli.create_bucket:
@@ -265,7 +268,7 @@ class CliTool:
                 exit(1)
             else:
                 print "Creating bucket '{}'".format(self.config.bucket)
-                create_bucket_command = ["aws", "s3api", "create-bucket", "--bucket", self.config.bucket]
+                create_bucket_command = ["aws", "s3", "mb", self.get_s3_bucket_uri()]
                 self.exec_aws_command(create_bucket_command)
         else:
             if not bucket_exists:
@@ -298,7 +301,7 @@ class CliTool:
         self.run_aws_cloudformation_wait_command('delete')
 
         if self.cli.delete_bucket:
-            delete_bucket_command = ["aws", "s3api", "delete-bucket", "--bucket", self.config.bucket]
+            delete_bucket_command = ["aws", "s3", "rb", self.get_s3_bucket_uri()]
             self.exec_aws_command(delete_bucket_command)
 
     def invoke(self):

@@ -184,10 +184,9 @@ def test_delete_command_with_delete_bucket(monkeypatch):
     assert '--profile' not in lambda_cron.commands_list[0]
     assert 'stack-delete-complete' in lambda_cron.commands_list[1]
     assert '--profile' not in lambda_cron.commands_list[1]
-    assert 's3api' in lambda_cron.commands_list[2]
-    assert 'delete-bucket' in lambda_cron.commands_list[2]
-    assert '--bucket' in lambda_cron.commands_list[2]
-    assert 'test-bucket-custom' in lambda_cron.commands_list[2]
+    assert 's3' in lambda_cron.commands_list[2]
+    assert 'rb' in lambda_cron.commands_list[2]
+    assert 's3://test-bucket-custom' in lambda_cron.commands_list[2]
 
 
 def test_add_profile_to_delete_commands(monkeypatch):
@@ -472,10 +471,9 @@ def test_check_bucket_need_create_bucket(bucket_exists_mock, monkeypatch):
 
     assert len(lambda_cron.commands_list) == 1
     assert "aws" in lambda_cron.commands_list[0]
-    assert "s3api" in lambda_cron.commands_list[0]
-    assert "create-bucket" in lambda_cron.commands_list[0]
-    assert "--bucket" in lambda_cron.commands_list[0]
-    assert "test-bucket-custom" in lambda_cron.commands_list[0]
+    assert "s3" in lambda_cron.commands_list[0]
+    assert "mb" in lambda_cron.commands_list[0]
+    assert "s3://test-bucket-custom" in lambda_cron.commands_list[0]
 
 
 @patch.object(LambdaCronCLISpy, 'bucket_exists')

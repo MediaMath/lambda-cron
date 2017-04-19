@@ -111,7 +111,7 @@ Resources:
       SourceArn: !GetAtt LambdaCronHourlyEvent.Arn
 
   LambdaCronSNSTopic:
-    Type: "AWS::SNS::Topic"
+    Type: AWS::SNS::Topic
     Condition: IsAlarmActive
     Properties:
       Subscription:
@@ -120,8 +120,14 @@ Resources:
           Protocol: "email"
       TopicName: !Sub LambdaCron-${Environment}
 
-  LambdaCronAalarm:
-    Type: "AWS::CloudWatch::Alarm"
+  LambdaCronLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/LambdaCron-${Environment}
+      RetentionInDays: 90
+
+  LambdaCronAlarm:
+    Type: AWS::CloudWatch::Alarm
     Condition: IsAlarmActive
     Properties:
       Namespace: AWS/Lambda
@@ -142,6 +148,32 @@ Resources:
       AlarmActions:
         - Ref: LambdaCronSNSTopic
       AlarmDescription: !Sub Errors in LambdaCron ${Environment}
+      ActionsEnabled: True
+
+  LambdaCronErrorsMetric:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LambdaCronLogGroup
+      FilterPattern: "ERROR"
+      MetricTransformations:
+      - MetricValue: '1'
+        MetricNamespace: !Sub LambdaCron-${Environment}/Errors
+        MetricName: ErrorsCount
+
+  LambdaCronErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: IsAlarmActive
+    Properties:
+      Namespace: !Sub LambdaCron-${Environment}/Errors
+      MetricName: ErrorsCount
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Threshold: 1
+      Statistic: Sum
+      Period: !Ref AlarmPeriod
+      EvaluationPeriods: '1'
+      AlarmActions:
+        - Ref: LambdaCronSNSTopic
+      AlarmDescription: !Sub Errors running tasks for LambdaCron ${Environment}
       ActionsEnabled: True
 
 Outputs:
