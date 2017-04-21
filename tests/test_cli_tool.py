@@ -628,3 +628,18 @@ def test_validate_command_directory_error(monkeypatch):
         lambda_cron.run()
 
     assert system_exit.value.code == 1
+
+
+def test_validate_invalid_file_extension(monkeypatch):
+    monkeypatch.setattr(cli_config, 'get_cli_config_file_path', valid_cong_file_path)
+    cli_params = Namespace()
+    cli_params.command = 'validate'
+    cli_params.task_file = get_test_task_path('invalid/invalid_extension.yml')
+    cli_params.task_directory = None
+
+    lambda_cron = LambdaCronCLISpy(cli_params)
+
+    with pytest.raises(SystemExit) as system_exit:
+        lambda_cron.run()
+
+    assert system_exit.value.code == 1

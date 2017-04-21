@@ -343,14 +343,14 @@ class CliTool:
             if self.cli.task_directory:
                 all_yml_files = [os.path.join(dirpath, f)
                                  for dirpath, dirnames, files in os.walk(self.cli.task_directory)
-                                 for f in files if f.endswith('.yml')]
+                                 for f in files]
                 for file_name in all_yml_files:
+                    if not file_name.endswith('.yml'):
+                        raise RuntimeError('Task is not defined in YAML file (extension .yml): {}'.format(file_name))
                     self.validate_task(schema, file_name)
-        except jsonschema.exceptions.ValidationError, ex:
+        except Exception, ex:
             print("Validation failed! Validation error in task: {}".format(ex.message))
             sys.exit(1)
-        except Exception, ex:
-            raise ex
         print 'Validation success!'
 
     def print_summary(self):
