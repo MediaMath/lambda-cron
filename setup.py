@@ -7,14 +7,14 @@ except ImportError:
 
 setup(
     name='lambda-cron',
-    version='1.0.0',
+    version='0.2.0',
     author='MediaMath',
     author_email='jbravo@mediamath.com',
     description='Serverless cron tool to run on AWS',
     keywords='cron lambda aws serverless mediamath',
     url='https://github.com/mediaMath/lambda-cron',
     packages=[
-        'lambda_cron', 'lambda_cron.aws', 'lambda_cron.aws.lib', 'lambda_cron.cli'
+        'lambda_cron', 'lambda_cron.aws', 'lambda_cron.aws.lib', 'lambda_cron.cli', 'lambda_cron.cli.command'
     ],
     package_dir={'lambda_cron': 'lambda_cron'},
     package_data={'lambda_cron': ['lambda-cron', 'requirements.txt', 'schema.json', 'template.cfn.yml']},
