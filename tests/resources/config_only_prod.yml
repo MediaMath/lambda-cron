@@ -1,0 +1,7 @@
+prod:
+  bucket: 'test-bucket-custom'
+  alarm:
+    enabled: True
+    email: my@email.com
+  every:
+    minutes: 5

@@ -4,12 +4,12 @@
 ![LambdaCron](./lambda-cron-diagram.png "LambdaCron")
 
 **LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
-on AWS cloud and all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
+on AWS cloud, all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
 
 Tasks are scheduled using the same syntax for expressions as linux 
 [crontab](https://help.ubuntu.com/community/CronHowto).
 
-**LambdaCron** offer 3 different type of task to run:
+**LambdaCron** offer 4 different type of task to run:
 
 * **Queue task**: send message to AWS SQS queue.
 * **Lambda task**: invoke AWS lambda function.
@@ -20,30 +20,30 @@ Tasks are defined in YAML files and are stored in a S3 bucket.
 
 ## LambdaCron CLI
 
-**LambdaCron** providfe a CLI tool that allow to manage you cron tasks from you localhost,
-without needing to access to AWS console.
+**LambdaCron** provide a CLI tool that allow to manage your cron tasks from you localhost,
+no need to access to AWS console.
 
 Also it allows to run multiple environments with different settings. As many environments
 as desired can be set up.
 
 ### Settings
 
-Custom settings from environments are set in a YAML file located in user home and
-called **~/.lambda-cron.yml**.
+Custom settings for environments are set in a YAML file located in user home, it must be
+called: **~/.lambda-cron.yml**.
 
 There are 3 levels of preferences for settings:
 
 * Environment: Custom values for an specific environment.
 * Global: Custom values that will have effect to all environments created.
-* Default: Default value for options in case no custom values are specified (by environment or globally)
+* Default: Default values in case no custom values are specified (by environment or globally)
 
 Highest level of preference is *Environment*, followed by *Global* and finally *Default*. Each option 
 in the settings can set the value from different levels. Higher level of preference overwrite lower levels.
 
-Settings are saved in a YAML file. Each environment is defined with a root key the YAML
-as the global settings with the key *global*.
+Settings are saved in a YAML file. Each environment is defined with a root key in the YAML,
+global settings are identified with the key *global*.
 
-Following are the available options:
+Options available:
 
 #### bucket
 
@@ -83,7 +83,7 @@ More info for [frequency](#frequency)
 
 #### alarm
 
-Alarm can be set up using CloudWatch metrics. It use the following parameters:
+Alarm can be set up using CloudWatch metrics. It uses following parameters:
 
 * enabled
 * email (Required if alarm is enabled).
@@ -98,7 +98,7 @@ alarm:
 
 #### enabled
 
-It allows to enabled/disabled the cron.
+It allows to enabled/disabled the cron (CloudWatch event).
 
 ```yaml
 enabled: True
