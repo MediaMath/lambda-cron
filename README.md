@@ -4,15 +4,15 @@
 ![LambdaCron](./lambda-cron-diagram.png "LambdaCron")
 
 **LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
-on AWS cloud, all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
+on the AWS cloud, all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
 
-Tasks are scheduled using the same syntax for expressions as linux 
+Tasks are scheduled using the same syntax for expressions as Linux
 [crontab](https://help.ubuntu.com/community/CronHowto).
 
-**LambdaCron** offer 4 different type of task to run:
+**LambdaCron** offers 4 different types of tasks:
 
 * **Queue task**: send message to AWS SQS queue.
-* **Lambda task**: invoke AWS lambda function.
+* **Lambda task**: invoke AWS Lambda function.
 * **Batch task**: submit AWS Batch job.
 * **HTTP task**: send HTTP requests (GET & POST).
 
@@ -20,16 +20,13 @@ Tasks are defined in YAML files and are stored in a S3 bucket.
 
 ## LambdaCron CLI
 
-**LambdaCron** provide a CLI tool that allow to manage your cron tasks from you localhost,
-no need to access to AWS console.
-
-Also it allows to run multiple environments with different settings. As many environments
-as desired can be set up.
+**LambdaCron** provides a CLI tool that allows management of your cron tasks without access
+to the AWS Console.  It also allows creation of multiple environments with different settings.
 
 ### Settings
 
-Custom settings for environments are set in a YAML file located in user home, it must be
-called: **~/.lambda-cron.yml**.
+Custom settings for environments are set in a YAML-formatted configuration file located in the
+user home directory, and must be named **~/.lambda-cron.yml**.
 
 There are 3 levels of preferences for settings:
 
@@ -37,36 +34,36 @@ There are 3 levels of preferences for settings:
 * Global: Custom values that will have effect to all environments created.
 * Default: Default values in case no custom values are specified (by environment or globally)
 
-Highest level of preference is *Environment*, followed by *Global* and finally *Default*. Each option 
+Highest level of preference is *Environment*, followed by *Global* and finally *Default*. Each option
 in the settings can set the value from different levels. Higher level of preference overwrite lower levels.
 
-Settings are saved in a YAML file. Each environment is defined with a root key in the YAML,
-global settings are identified with the key *global*.
+Each environment is defined with a root key in the YAML, while global settings are identified with the
+key *global*.
 
 Options available:
 
 #### bucket
 
-Name of the bucket where lambda function code will be hosted and tasks stored.
+Name of the bucket where Lambda function code will be hosted and tasks stored.
 
 ```yaml
 bucket: 'my-custom-bucket-name'
 ```
 
-You can use the pattern **{environment}** in the string for the bucket, it will
+You can use the macro, **{environment}**, in the string for the bucket, and it will
 be replaced by the environment name.
 
-**Defualt**: lambda-cron-{environment}
+**Default**: lambda-cron-{environment}
 
-The bucket will have to folders:
+The bucket will have two folders:
 
 * code/
 * tasks/
 
 #### every (frequency)
 
-Frequency with which the lambda function that evaluate tasks will run.
-It indicates the frequency by **minutes OR hours** with an integer number.
+Frequency at which the Lambda function will execute to run tasks.
+It indicates the frequency in **minutes OR hours** with an integer number.
 It is specified with one of the following parameters:
 
 * minutes
@@ -77,13 +74,13 @@ every:
     minutes: 5
 ```
 
-**Defualt**: every hour.
+**Default**: every hour.
 
-More info for [frequency](#frequency)
+More info for [frequency](#frequency).
 
 #### alarm
 
-Alarm can be set up using CloudWatch metrics. It uses following parameters:
+Alarm can be set up using CloudWatch metrics. It uses the following parameters:
 
 * enabled
 * email (Required if alarm is enabled).
@@ -94,17 +91,17 @@ alarm:
     email: my-mailing-list@email.com
 ```
 
-**Defualt**: not enabled.
+**Default**: disabled.
 
 #### enabled
 
-It allows to enabled/disabled the cron (CloudWatch event).
+It enables/disables the cron (CloudWatch event).
 
 ```yaml
 enabled: True
 ```
 
-**Defualt**: enabled.
+**Default**: enabled.
 
 #### Example
 
@@ -115,7 +112,7 @@ global:
 prod:
   alarm:
     enabled: True
-    email: dev-alerts@domain.com
+    email: prod-alerts@domain.com
   every:
     minutes: 5
 
@@ -134,7 +131,7 @@ The settings for each environment will be:
   * bucket: my-project-cron-prod
   * alarm:
     * enabled: True
-    * email: dev-alerts@domain.com
+    * email: prod-alerts@domain.com
   * every:
     * minutes: 5
 
@@ -153,14 +150,16 @@ The settings for each environment will be:
   * alarm:
     * enabled: False
     * email: ''
-  
+
 ### Commands
 
-**LambdaCron** CLI use [aws-cli](https://github.com/aws/aws-cli), every command
-is translated into aws-cli command. AWS account should be configured for aws-cli. 
-LambdaCron CLI allow to specify different aws-cli profiles.
+The **LambdaCron** CLI uses the [AWS CLI](https://github.com/aws/aws-cli), and translates
+every command into an AWS CLI command.  The AWS account used should be configured for AWS
+CLI access.  The LambdaCron CLI allows different AWS CLI
+[profiles](http://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html) to
+be specified.
 
-Following is the list of commands available.
+The following is the list of commands available.
 
 #### create
 
@@ -192,7 +191,7 @@ Parameters:
 
 #### stop
 
-Disable LambdaCron, it won't run until it is enabled (#start command)
+Disable LambdaCron, and it won't run until it is enabled (#start command) again.
 
 Parameters:
 
@@ -201,7 +200,7 @@ Parameters:
 
 #### invoke
 
-Invoke lambda function cron manually
+Invoke Lambda function cron manually.
 
 Parameters:
 
@@ -210,7 +209,7 @@ Parameters:
 
 #### delete
 
-Delete **LambdaCron** environment from the AWS account
+Delete **LambdaCron** environment from the AWS account.
 
 Parameters:
 
@@ -218,12 +217,12 @@ Parameters:
 * **--delete-bucket**: Flag to indicate that the bucket must be deleted from S3 (optional)
 * **--aws-profile (-a)**: AWS profile to use from aws-cli (string) (optional)
 
-Note: To delete de bucket it must be empty.
+Note: The bucket must be empty before it can be deleted.
 
 #### upload-tasks
 
-Upload tasks to S3 bucket to run with lambda-cron. It will sync the directory
-with S3 deleting tasks have been deleted from the local directory.
+Upload tasks to S3 bucket to be run with LambdaCron. It will sync the directory
+with S3, including deleting tasks have been deleted from the local directory.
 
 Parameters:
 
@@ -244,20 +243,21 @@ Parameters:
 
 ## Tasks
 
-Tasks are defined in YAML files, each task in an independent file. Task must follow
-the json schema provided in this repo: [schema](./lambda_cron/schema.json).
+Tasks are defined in YAML files, with each task in an independent file. A task must follow
+the JSON schema provided in this repo: [schema](./lambda_cron/schema.json).
 
-All tasks must contains following keys and values:
+All tasks must contain the following keys and values:
 
 * **name**: task name
 * **expression**: crontab expression
 * **task**: task definition (customized for each type of tasks)
 
-For each kind of task there a set of specific keys a values to set. Described bellow.
+Each type of task has its own set of required keys as described in the following section.
+
 
 ### Queue task
 
-It sends a message to a AWS SQS queue.
+It sends a message to an AWS SQS queue.
 The task definition must contains following keys:
 
 * **type**: *queue*
@@ -284,10 +284,10 @@ All parameters of the function will be supported soon.
 ### Lambda task
 
 It invokes an AWS lambda functions.
-The task definition must contains following keys:
+The task definition must contain the following keys:
 
 * **type**: *lambda*
-* **FunctionName**: Name of the lambda function to invoke (string)
+* **FunctionName**: Name of the Lambda function to invoke (string)
 * **InvokeArgs**: arguments to send (YAML/JSON)
 
 ``` yaml
@@ -301,12 +301,12 @@ task:
     output: 's3://my-data-output/performance'
 ```
 
-Function is invoked using [boto3 Lambda.Client.invoke_async](http://boto3.readthedocs.io/en/latest/reference/services/lambda.html#Lambda.Client.invoke_async)
+The function is invoked using [boto3 Lambda.Client.invoke_async](http://boto3.readthedocs.io/en/latest/reference/services/lambda.html#Lambda.Client.invoke_async)
 
 ### Batch task
 
-It submits AWS Batch Jobs.
-The task definition must contains following keys:
+It submits AWS Batch jobs.
+The task definition must contain the following keys:
 
 * **type**: *batch*
 * **jobName**: name to assign to the job (string)
@@ -324,12 +324,12 @@ task:
 ```
 
 It is a wrapper for [boto3 Batch.Client.submit_job](http://boto3.readthedocs.io/en/latest/reference/services/batch.html#Batch.Client.submit_job).
-It means all parameters for the method can be set in the task definition.
+All parameters for the method can be set in the task definition.
 
 ### HTTP task
 
-It send and HTTP request (GET or POST).
-The task definition must contains following keys:
+It sends an HTTP request (GET or POST).
+The task definition must contain the following keys:
 
 * **type**: *http*
 * **method**: http method (get | post)
@@ -348,24 +348,24 @@ task:
 ```
 
 It is a wrapper over [Requests](http://docs.python-requests.org/en/master/).
-All http methods will be supported soon.
+All HTTP methods will be supported soon.
 
 ## Frequency
 
-#### Execution time 
+#### Execution time
 All tasks scheduled to run between the current event and the next event will be run immediately.
 
 Example: LambdaCron runs every hour ('0 * * * *'), tasks '0 1 * * *' and '58 1 * * *' will run at the same time.
 
-####  Task frequency  
-Lambda cron will execute a task at most once invocation.  This can result in a task being run fewer times than it's cron expression implies.
+####  Task frequency
+LambdaCron will execute a task at most once for each invocation.  This can result in a task being run fewer times than it's cron expression implies.
 
-Example: If LambdaCron runs every hour ('0 * * * *'), a task '*/15 * * * *' will only run once an hour.  If LambdaCron runs every minute ('* * * * *'), a task '*/15 * * * *' will only run four times an hour.
+Example: If LambdaCron runs every hour ('0 * * * *'), a task '*/15 * * * *' will only run once an hour.  If LambdaCron runs every minute ('* * * * *'), a task '*/15 * * * *' will only run four times an hour.  You can set up LambdaCron to run more frequently than an hour if you need a task to be run more frequently.
 
 ####  Frequecy and Precision
 
 Events are based on [AWS CloudWatch Events](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html).
-You can read in following [documentation](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html):
+You can learn about them in the [Scheduled Events documentation](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html):
 
 * "The finest resolution using a Cron expression is a minute"
 * "Your scheduled rule is triggered within that minute, but not on the precise 0th second"
@@ -392,7 +392,7 @@ Be aware of this.
 $ pip install lambda-cron
 ```
 
-### Usage 
+### Usage
 
 Create your first environment (called 'test') with default settings:
 
@@ -403,7 +403,7 @@ $ lambda-cron create --environment=test --create-bucket
 If you want to set some custom settings, create the setting file in the home
 directory of the user who is running the tool.
 
-* ~/.lambda-cron.yml
+* `~/.lambda-cron.yml`
 
 For help:
 
@@ -419,7 +419,7 @@ $ lambda-cron create --help
 
 ## Development
 
-To start working with **LambdaCron** you should clone the project, create a 
+To start working with **LambdaCron** you should clone the project, create a
 virtualenv (optional) and install dependencies:
 
 ``` bash
@@ -433,8 +433,8 @@ $ ./lambda_cron/lambda-cron --help
 
 ## Contributing
 
-Contributions are welcome. You can find open issues with some features and 
+Contributions are welcome. You can find open issues with some features and
 improvements that would be good to have in **LambdaCron**.
 
-Before contribute we encourage to take a look of following 
+Before contribute we encourage to take a look of following
 [tips provided by GitHub](https://guides.github.com/activities/contributing-to-open-source/)
