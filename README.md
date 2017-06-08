@@ -4,19 +4,34 @@
 ![LambdaCron](./lambda-cron-diagram.png "LambdaCron")
 
 **LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
-on the AWS cloud, all managed by a command line tool ([LambdaCron CLI](#lambdacron-cli)).
+on the AWS cloud, tasks defined in YAML and all managed by a command line tool 
+([LambdaCron CLI](#lambdacron-cli)). Tasks are scheduled using the same syntax for
+expressions as Linux [crontab](https://help.ubuntu.com/community/CronHowto).
 
-Tasks are scheduled using the same syntax for expressions as Linux
-[crontab](https://help.ubuntu.com/community/CronHowto).
+Traditionally, to run scheduled tasks you need set up cron jobs in the server where 
+you want them to run. Nonetheless this doesn't make sense anymore when building a 
+serverless architecture, where servers are transparent to users. In order to solve this
+AWS provide [CloudWatch Events](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html),
+which allow you to run scheduled events (called rules) to invoke some others AWS services in
+a cron-like way. It is useful tool but it is detached from the traditional way to manage
+and run cron jobs and it has some [limitations](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/cloudwatch_limits_cwe.html)
 
-**LambdaCron** offers 4 different types of tasks:
+LambdaCron is trying to fill in the gap providing a tool to define cron jobs in a
+user friendly manner and manage them how developers are used to. With LambdaCron you 
+define each of your tasks in an independent YAML file including the cron expression.
+Once you tasks are defined you will manage them using a command line tool, from your 
+terminal without the need to access to the AWS console. 
+
+LambdaCron offers 4 different types of tasks:
 
 * **Queue task**: send message to AWS SQS queue.
 * **Lambda task**: invoke AWS Lambda function.
 * **Batch task**: submit AWS Batch job.
 * **HTTP task**: send HTTP requests (GET & POST).
 
-Tasks are defined in YAML files and are stored in a S3 bucket.
+Currently it provides as target 3 AWS services and HTTP requests, but what is most 
+important is that it is ready be extended for other services and, in general, it is
+ready to reach any service available by an API.
 
 ## LambdaCron CLI
 
@@ -243,8 +258,8 @@ Parameters:
 
 ## Tasks
 
-Tasks are defined in YAML files, with each task in an independent file. A task must follow
-the JSON schema provided in this repo: [schema](./lambda_cron/schema.json).
+Tasks are defined in YAML files (each task in an independent file) and stored in S3.
+A task must follow the JSON schema provided in this repo: [schema](./lambda_cron/schema.json).
 
 All tasks must contain the following keys and values:
 
@@ -328,7 +343,8 @@ All parameters for the method can be set in the task definition.
 
 ### HTTP task
 
-It sends an HTTP request (GET or POST).
+It sends an HTTP request (GET or POST). This task allows to reach any service
+that provides an API.
 The task definition must contain the following keys:
 
 * **type**: *http*
