@@ -4,23 +4,21 @@
 ![LambdaCron](./lambda-cron-diagram.png "LambdaCron")
 
 **LambdaCron** is a serverless cron tool. It provides a way to run scheduled tasks
-on the AWS cloud, tasks defined in YAML and all managed by a command line tool 
+on the AWS cloud defined in YAML and managed by a command line tool 
 ([LambdaCron CLI](#lambdacron-cli)). Tasks are scheduled using the same syntax for
 expressions as Linux [crontab](https://help.ubuntu.com/community/CronHowto).
 
 Traditionally, to run scheduled tasks you need set up cron jobs in the server where 
-you want them to run. Nonetheless this doesn't make sense anymore when building a 
+you want them to run. This doesn't make sense when building a 
 serverless architecture, where servers are transparent to users. In order to solve this
-AWS provide [CloudWatch Events](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html),
-which allow you to run scheduled events (called rules) to invoke some others AWS services in
-a cron-like way. It is useful tool but it is detached from the traditional way to manage
-and run cron jobs and it has some [limitations](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/cloudwatch_limits_cwe.html)
+AWS provides [CloudWatch Events](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html),
+which allow you to run scheduled events (called rules) to invoke AWS services in
+a cron-like way. While it is a useful tool, it is very different from the traditional way to manage
+and run cron jobs and it has some serious [limitations](http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/cloudwatch_limits_cwe.html).
 
-LambdaCron is trying to fill in the gap providing a tool to define cron jobs in a
-user friendly manner and manage them how developers are used to. With LambdaCron you 
-define each of your tasks in an independent YAML file including the cron expression.
-Once you tasks are defined you will manage them using a command line tool, from your 
-terminal without the need to access to the AWS console. 
+LambdaCron fills in the gap by providing a user friendly way to manage serverless cron jobs just like cron. 
+With LambdaCron you define each of your tasks in an independent YAML file.
+Once you tasks are defined you can manage them using the command line tool without the need to access to the AWS console. 
 
 LambdaCron offers 4 different types of tasks:
 
@@ -29,8 +27,8 @@ LambdaCron offers 4 different types of tasks:
 * **Batch task**: submit AWS Batch job.
 * **HTTP task**: send HTTP requests (GET & POST).
 
-Currently it provides as target 3 AWS services and HTTP requests, but what is most 
-important is that it is ready be extended for other services and, in general, it is
+Currently LambdaCron intergrates with HTTP requests and 3 AWS services. 
+It is ready be extended for other services and, in general, it is
 ready to reach any service available by an API.
 
 ## LambdaCron CLI
@@ -47,7 +45,7 @@ There are 3 levels of preferences for settings:
 
 * Environment: Custom values for an specific environment.
 * Global: Custom values that will have effect to all environments created.
-* Default: Default values in case no custom values are specified (by environment or globally)
+* Default: Default values, in case no custom values are specified (by environment or globally)
 
 Highest level of preference is *Environment*, followed by *Global* and finally *Default*. Each option
 in the settings can set the value from different levels. Higher level of preference overwrite lower levels.
@@ -452,5 +450,5 @@ $ ./lambda_cron/lambda-cron --help
 Contributions are welcome. You can find open issues with some features and
 improvements that would be good to have in **LambdaCron**.
 
-Before contribute we encourage to take a look of following
+Before contribute we encourage to take a look at the following
 [tips provided by GitHub](https://guides.github.com/activities/contributing-to-open-source/)
