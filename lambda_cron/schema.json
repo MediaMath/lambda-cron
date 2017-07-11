@@ -42,6 +42,30 @@
         },
         {
           "properties": {
+            "type": { "type": "string", "enum": ["athena"] },
+            "QueryString": { "type": "string" },
+            "ResultConfiguration": {
+              "type": "object",
+              "properties": {
+                "OutputLocation": { "type": "string" },
+                "EncryptionConfiguration": {
+                  "type": "object",
+                  "properties": {
+                    "EncryptionOption": {
+                      "type": "string",
+                      "enum": ["SSE-S3", "Sse-s3", "sse-s3", "SSE-KMS", "Sse-kms", "sse-kms", "CSE-KMS", "Cse-kms", "cse-kms"]
+                    }
+                  },
+                  "required": ["EncryptionOption"]
+                }
+              },
+              "required": ["OutputLocation", "EncryptionConfiguration"]
+            }
+          },
+          "required": ["type", "QueryString", "ResultConfiguration"]
+        },
+        {
+          "properties": {
             "type": { "type": "string", "enum": ["http"] },
             "method": { "type": "string", "enum": ["GET", "get", "Get", "POST", "post", "Post"]},
             "request": { "type": "object" }
