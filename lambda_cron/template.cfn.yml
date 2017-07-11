@@ -91,6 +91,10 @@ Resources:
             Action:
               - batch:SubmitJob
             Resource: ['*']
+            - Effect: Allow
+            Action:
+              - athena:StartQueryExecution
+            Resource: ['*']
 
   LambdaCronHourlyEvent:
     Type: AWS::Events::Rule
