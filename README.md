@@ -373,19 +373,15 @@ The task definition must contain the following keys:
 * **QueryString**: The SQL query statements to be executed (string)
 * **ResultConfiguration**: (map)
     * **OutputLocation**: the location in S3 where query results are stored (string)
-    * **EncryptionConfiguration**: (map)
-        * **EncryptionOption**: SSE-S3 | SSE-KMS | CSE-KMS (string)
 
 ``` yaml
 name: 'get high scores every fifteen minutes'
 expression: '0 15 * * *'
 task:
   type: 'athena'
-  QueryString: 'SELECT Username, HighScore FROM UserTable WHERE HighScore > 1000'
+  QueryString: 'SELECT Username, HighScore FROM Database.UserTable WHERE HighScore > 1000'
   ResultConfiguration:
     OutputLocation: 'http://scores.my-app.s3.amazonaws.com'
-    EncryptionConfiguration:
-      EncryptionOption: 'SSE-S3'
 ```
 
 It is a wrapper for [boto3 Athena.Client.start_query_execution](https://boto3.readthedocs.io/en/latest/reference/services/athena.html#Athena.Client.start_query_execution). All parameters for the method can be set in the task definition.

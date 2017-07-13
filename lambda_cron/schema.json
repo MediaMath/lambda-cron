@@ -47,19 +47,9 @@
             "ResultConfiguration": {
               "type": "object",
               "properties": {
-                "OutputLocation": { "type": "string" },
-                "EncryptionConfiguration": {
-                  "type": "object",
-                  "properties": {
-                    "EncryptionOption": {
-                      "type": "string",
-                      "enum": ["SSE-S3", "Sse-s3", "sse-s3", "SSE-KMS", "Sse-kms", "sse-kms", "CSE-KMS", "Cse-kms", "cse-kms"]
-                    }
-                  },
-                  "required": ["EncryptionOption"]
-                }
+                "OutputLocation": { "type": "string" }
               },
-              "required": ["OutputLocation", "EncryptionConfiguration"]
+              "required": ["OutputLocation"]
             }
           },
           "required": ["type", "QueryString", "ResultConfiguration"]

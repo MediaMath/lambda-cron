@@ -5,5 +5,4 @@ task:
   QueryString: 'SELECT * FROM TestTable'
   ResultConfiguration:
     OutputLocation: 'test-bucket'
-    EncryptionConfiguration:
-      EncryptionOption: 'SSE-S3'
+

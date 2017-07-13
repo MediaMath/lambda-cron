@@ -402,10 +402,6 @@ ATHENA_TASK_BODY =\
         'ResultConfiguration':
             {
                 'OutputLocation': 'bucketname.s3.aws.com/foo/bar/',
-                'EncryptionConfiguration':
-                    {
-                        'EncryptionOption': 'SSE-S3'
-                    }
             }
     }
 
@@ -431,10 +427,5 @@ def test_athena_should_run_basic(get_athena_client_mock, athena_client_spy, cron
     assert athena_client_spy.parameters['QueryString'] == 'SELECT * FROM testing'
     assert 'ResultConfiguration' in athena_client_spy.parameters
     assert type(athena_client_spy.parameters['ResultConfiguration']) == dict
-    assert sorted(athena_client_spy.parameters['ResultConfiguration'].keys()) == ['EncryptionConfiguration',
-                                                                                   'OutputLocation']
+    assert sorted(athena_client_spy.parameters['ResultConfiguration'].keys()) == ['OutputLocation']
     assert athena_client_spy.parameters['ResultConfiguration']['OutputLocation'] == 'bucketname.s3.aws.com/foo/bar/'
-    assert type(athena_client_spy.parameters['ResultConfiguration']['EncryptionConfiguration']) == dict
-    assert athena_client_spy.parameters['ResultConfiguration']['EncryptionConfiguration'].keys() == ['EncryptionOption']
-    assert athena_client_spy.parameters['ResultConfiguration']['EncryptionConfiguration']['EncryptionOption'] == \
-           'SSE-S3'

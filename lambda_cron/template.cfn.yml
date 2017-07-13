@@ -91,9 +91,15 @@ Resources:
             Action:
               - batch:SubmitJob
             Resource: ['*']
-            - Effect: Allow
+          - Effect: Allow
             Action:
               - athena:StartQueryExecution
+            Resource: ['*']
+          - Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+              - s3:PutObject
             Resource: ['*']
 
   LambdaCronHourlyEvent:
