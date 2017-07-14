@@ -44,10 +44,13 @@
           "properties": {
             "type": { "type": "string", "enum": ["athena"] },
             "QueryString": { "type": "string" },
+            "ClientRequestToken": { "type": "string" },
+            "QueryExecutionContext": { "type": "object" },
             "ResultConfiguration": {
               "type": "object",
               "properties": {
-                "OutputLocation": { "type": "string" }
+                "OutputLocation": { "type": "string" },
+                "EncryptionConfiguration": { "type": "object" }
               },
               "required": ["OutputLocation"]
             }

@@ -72,12 +72,10 @@ Resources:
             Resource: arn:aws:logs:*:*:*
           - Effect: Allow
             Action:
-              - s3:ListBucket
-            Resource: !Sub arn:aws:s3:::${Bucket}
-          - Effect: Allow
-            Action:
-              - s3:GetObject
-            Resource: !Sub arn:aws:s3:::${Bucket}/tasks/*
+              - s3:Get*
+              - s3:List*
+              - s3:PutObject
+            Resource: ['*']
           - Effect: Allow
             Action:
               - sqs:SendMessage
@@ -94,12 +92,6 @@ Resources:
           - Effect: Allow
             Action:
               - athena:StartQueryExecution
-            Resource: ['*']
-          - Effect: Allow
-            Action:
-              - s3:Get*
-              - s3:List*
-              - s3:PutObject
             Resource: ['*']
 
   LambdaCronHourlyEvent:
