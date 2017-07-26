@@ -45,6 +45,9 @@ class TaskRunner:
     def get_batch_task_runner(self, task):
         return BatchJobTask(task)
 
+    def get_athena_task_runner(self, task):
+        return AthenaQueryTask(task)
+
 
 class Task:
 
@@ -97,3 +100,13 @@ class BatchJobTask(Task):
     def run(self):
         self.task.pop('type')
         self.get_batch_client().submit_job(**self.task)
+
+
+class AthenaQueryTask(Task):
+
+    def get_athena_client(self):
+        return boto3.client('athena')
+
+    def run(self):
+        self.task.pop('type')
+        self.get_athena_client().start_query_execution(**self.task)

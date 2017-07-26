@@ -1,0 +1,8 @@
+name: 'test athena task'
+expression: '0 11 * * *'
+task:
+  type: 'athena'
+  QueryString: 'SELECT * FROM TestTable'
+  ResultConfiguration:
+    OutputLocation: 'test-bucket'
+

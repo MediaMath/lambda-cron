@@ -15,7 +15,8 @@
 import pytest
 import json
 from mock import patch
-from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask, BatchJobTask
+from lambda_cron.aws.lib.task_runner import TaskRunner, QueueTask, InvokeLambdaTask, HttpTask, BatchJobTask, \
+    AthenaQueryTask
 from lambda_cron.aws.lib.cron_checker import CronChecker
 
 
@@ -377,3 +378,54 @@ def test_batch_should_run_basic(get_batch_client_mock, batch_client_spy, cron_ch
     assert batch_client_spy.parameters['jobQueue'] == 'testing-batch-job-queue'
     assert 'parameters' in batch_client_spy.parameters
     assert batch_client_spy.parameters['parameters'] == BATCH_TASK_BODY['parameters']
+
+
+class AthenaClientSpy:
+    def __init__(self):
+        self.parameters = None
+        self.calls = 0
+
+    def start_query_execution(self, **kwargs):
+        self.parameters = kwargs
+        self.calls += 1
+
+
+@pytest.fixture(scope="function")
+def athena_client_spy():
+    return AthenaClientSpy()
+
+
+ATHENA_TASK_BODY =\
+    {
+        'type': 'athena',
+        'QueryString': 'SELECT * FROM testing',
+        'ResultConfiguration':
+            {
+                'OutputLocation': 'bucketname.s3.aws.com/foo/bar/',
+            }
+    }
+
+
+@pytest.fixture(scope="function")
+def athena_task_definition():
+    return {
+        'name': 'Test task',
+        'expression': '0 11 * * *',
+        'task': dict(ATHENA_TASK_BODY)
+    }
+
+
+@patch.object(AthenaQueryTask, 'get_athena_client')
+def test_athena_should_run_basic(get_athena_client_mock, athena_client_spy, cron_checker, athena_task_definition):
+    get_athena_client_mock.return_value = athena_client_spy
+
+    task_runner = TaskRunner(cron_checker)
+    task_runner.run(athena_task_definition)
+
+    assert athena_client_spy.calls == 1
+    assert 'QueryString' in athena_client_spy.parameters
+    assert athena_client_spy.parameters['QueryString'] == 'SELECT * FROM testing'
+    assert 'ResultConfiguration' in athena_client_spy.parameters
+    assert type(athena_client_spy.parameters['ResultConfiguration']) == dict
+    assert sorted(athena_client_spy.parameters['ResultConfiguration'].keys()) == ['OutputLocation']
+    assert athena_client_spy.parameters['ResultConfiguration']['OutputLocation'] == 'bucketname.s3.aws.com/foo/bar/'

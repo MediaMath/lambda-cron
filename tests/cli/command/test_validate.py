@@ -52,6 +52,14 @@ def test_validate_command_lambda_task():
     validate_command.run()
 
 
+def test_validate_command_athena_task():
+    cli_arguments = Namespace()
+    cli_arguments.task_file = get_test_task_path('valid/athena_task.yml')
+    cli_arguments.task_directory = None
+    validate_command = ValidateCommand(CliConfig('test'), cli_arguments)
+    validate_command.run()
+
+
 def test_validate_command_with_error():
     cli_arguments = Namespace()
     cli_arguments.task_file = get_test_task_path('invalid/invalid_task.yml')

@@ -27,7 +27,7 @@ LambdaCron offers 4 different types of tasks:
 * **Batch task**: submit AWS Batch job.
 * **HTTP task**: send HTTP requests (GET & POST).
 
-Currently LambdaCron intergrates with HTTP requests and 3 AWS services. 
+Currently LambdaCron integrates with HTTP requests and 3 AWS services. 
 It is ready be extended for other services and, in general, it is
 ready to reach any service available by an API.
 
@@ -251,7 +251,7 @@ from a file or a set of tasks in a directory.
 Parameters:
 
 * **--task-file (-t)**: File that contains a task definition.
-* **--task-directory (-d)**: Directory with a set of files with taqsks definitions.
+* **--task-directory (-d)**: Directory with a set of files with tasks definitions.
 
 
 ## Tasks
@@ -330,7 +330,7 @@ The task definition must contain the following keys:
 name: 'Enrich new stats every hour'
 expression: '0 * * * *'
 task:
-  type: 'bath'
+  type: 'batch'
   jobName: 'enrich-stats'
   jobDefinition: 'enrich-stats-definition:1'
   jobQueue: 'jobs_high_priority'
@@ -350,19 +350,41 @@ The task definition must contain the following keys:
 * **request**: YAML with parameters to send for the selected method using [Requests](http://docs.python-requests.org/en/master/)
 
 ``` yaml
-name: 'helth check every hour'
+name: 'health check every hour'
 expression: '0 * * * *'
 task:
   type: 'http'
   method: 'get'
   request:
-    url: 'http://helthcheck.my-domain.com'
+    url: 'http://healthcheck.my-domain.com'
     params:
       service: 'lambda'
 ```
 
 It is a wrapper over [Requests](http://docs.python-requests.org/en/master/).
 All HTTP methods will be supported soon.
+
+### Athena task
+
+It executes the SQL query.
+The task definition must contain the following keys:
+
+* **type**: *athena*
+* **QueryString**: The SQL query statements to be executed (string)
+* **ResultConfiguration**: (map)
+    * **OutputLocation**: the location in S3 where query results are stored (string)
+
+``` yaml
+name: 'get high scores every fifteen minutes'
+expression: '0 15 * * *'
+task:
+  type: 'athena'
+  QueryString: 'SELECT Username, HighScore FROM Database.UserTable WHERE HighScore > 1000'
+  ResultConfiguration:
+    OutputLocation: 'http://scores.my-app.s3.amazonaws.com'
+```
+
+It is a wrapper for [boto3 Athena.Client.start_query_execution](https://boto3.readthedocs.io/en/latest/reference/services/athena.html#Athena.Client.start_query_execution). All parameters for the method can be set in the task definition.
 
 ## Frequency
 
