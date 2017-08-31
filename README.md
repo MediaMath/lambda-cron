@@ -25,6 +25,7 @@ LambdaCron offers 4 different types of tasks:
 * **Queue task**: send message to AWS SQS queue.
 * **Lambda task**: invoke AWS Lambda function.
 * **Batch task**: submit AWS Batch job.
+* **Athena task**: submit AWS Athena query.
 * **HTTP task**: send HTTP requests (GET & POST).
 
 Currently LambdaCron integrates with HTTP requests and 3 AWS services. 
