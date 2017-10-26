@@ -50,6 +50,7 @@ def test_update_command(config_parser):
 
     assert len(update_command.commands_list) == 4
     assert 'pip' in update_command.commands_list[0]
+    assert '--profile' not in update_command.commands_list[0]
     assert 's3' in update_command.commands_list[1] and 'cp' in update_command.commands_list[1]
     assert 's3://test-bucket-custom' in update_command.commands_list[1][4]
     assert '--profile' not in update_command.commands_list[1]
@@ -79,6 +80,7 @@ def test_update_command_with_profile(config_parser):
 
     update_command.run()
 
+    assert '--profile' not in update_command.commands_list[0]
     assert '--profile' in update_command.commands_list[1]
     assert 'test-profile' in update_command.commands_list[1]
     assert '--profile' in update_command.commands_list[2]

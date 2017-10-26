@@ -46,8 +46,8 @@ class AwsCommand(Command):
     def run(self):
         raise NotImplementedError
 
-    def exec_command(self, command):
-        if self.arguments.aws_profile:
+    def exec_command(self, command, use_profile=True):
+        if self.arguments.aws_profile and use_profile:
             command.append('--profile')
             command.append(self.arguments.aws_profile)
         return Command.exec_command(self, command)

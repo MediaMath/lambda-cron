@@ -131,7 +131,7 @@ class CloudFormationCommand(AwsCommand):
                                get_requirements_txt(),
                                "--target", dependencies_directory,
                                "--ignore-installed"]
-        self.exec_command(pip_install_command)
+        self.exec_command(pip_install_command, use_profile=False)
         zip_dir(zip_file, dependencies_directory)
 
     def generate_lambda_functions_config(self, config_file_path):

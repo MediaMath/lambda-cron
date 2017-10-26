@@ -55,6 +55,7 @@ def test_create_command_with_bucket_exists_not_create_bucket(monkeypatch, config
 
     assert len(create_command.commands_list) == 4
     assert 'pip' in create_command.commands_list[0]
+    assert '--profile' not in create_command.commands_list[0]
     assert 's3' in create_command.commands_list[1] and 'cp' in create_command.commands_list[1]
     assert 's3://test-bucket-custom' in create_command.commands_list[1][4]
     assert '--profile' not in create_command.commands_list[1]
@@ -128,6 +129,7 @@ def test_create_command_with_bucket_not_exists_create_bucket(monkeypatch, config
     assert len(create_command.commands_list) == 5
     assert set(['aws', 's3', 'mb']).issubset(create_command.commands_list[0])
     assert 'pip' in create_command.commands_list[1]
+    assert '--profile' not in create_command.commands_list[1]
     assert 's3' in create_command.commands_list[2] and 'cp' in create_command.commands_list[2]
     assert 's3://test-bucket-custom' in create_command.commands_list[2][4]
     assert '--profile' not in create_command.commands_list[2]
@@ -164,6 +166,7 @@ def test_create_command_with_profile(monkeypatch, config_parser):
 
     assert '--profile' in create_command.commands_list[0]
     assert 'test-profile' in create_command.commands_list[0]
+    assert '--profile' not in create_command.commands_list[1]
     assert '--profile' in create_command.commands_list[2]
     assert 'test-profile' in create_command.commands_list[2]
     assert '--profile' in create_command.commands_list[3]
