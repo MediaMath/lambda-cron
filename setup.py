@@ -23,12 +23,12 @@ setup(
     package_dir={'lambda_cron': 'lambda_cron'},
     package_data={'lambda_cron': ['lambda-cron', 'requirements.txt', 'schema.json', 'template.cfn.yml']},
     install_requires=[
-        'croniter == 0.3.12',
-        'python-dateutil==2.5.3',
-        'PyYAML==3.12',
-        'requests==2.12.3',
-        'jsonschema==2.5.1',
-        'boto3==1.4.0'
+        'croniter>=0.3,<0.4',
+        'python-dateutil>=2.5,<2.6',
+        'PyYAML>=3.12,<3.13',
+        'requests>=2.13,<2.14',
+        'jsonschema>=2.6,<2.7',
+        'boto3>=1.4,<1.5'
     ],
     entry_points={
         'console_scripts': [
