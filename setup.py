@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 
+import lambda_cron
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
+version = lambda_cron.__version__
+
 setup(
     name='lambda-cron',
-    version='0.2.0',
+    version=version,
     author='MediaMath',
     author_email='jbravo@mediamath.com',
     description='Serverless cron tool to run on AWS',
     keywords='cron lambda aws serverless mediamath',
     url='https://github.com/mediaMath/lambda-cron',
+    download_url='https://github.com/mediamath/lambda-cron/archive/v{0}.tar.gz'.format(version),
     packages=[
         'lambda_cron', 'lambda_cron.aws', 'lambda_cron.aws.lib', 'lambda_cron.cli', 'lambda_cron.cli.command'
     ],
@@ -42,6 +46,5 @@ setup(
         'Natural Language :: English',
         'Operating System :: Unix',
         'Operating System :: MacOS',
-
     ]
 )
