@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/MediaMath/lambda-cron.svg?token=tMt81cZ8XUGin1RurU5s&branch=master)](https://travis-ci.com/MediaMath/lambda-cron)
+[![Build Status](https://travis-ci.org/MediaMath/lambda-cron.svg?branch=master)](https://travis-ci.org/MediaMath/lambda-cron)
 # LambdaCron
 
 ![LambdaCron](./lambda-cron-diagram.png "LambdaCron")
